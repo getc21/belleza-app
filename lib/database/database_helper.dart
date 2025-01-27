@@ -25,52 +25,63 @@ class DatabaseHelper {
           CREATE TABLE products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
+            description TEXT,  
+            price REAL,
+            weight TEXT,
+            category_id INTEGER NOT NULL,
+            supplier_id INTEGER NOT NULL,
+            location_id INTEGER NOT NULL,
+            foto TEXT,
             stock INTEGER,
-            expiryDate TEXT,
-            location TEXT
+            expirity_date TEXT
           )
         ''');
         db.execute('''
           CREATE TABLE categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT
+            name TEXT,
+            description TEXT,
+            foto TEXT
           )
         ''');
         db.execute('''
           CREATE TABLE suppliers (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT,
-            contact TEXT
+            foto TEXT,
+            name TEXT NOT NULL,
+            contact_name TEXT,
+            contact_email TEXT,
+            contact_phone TEXT,
+            address TEXT
           )
         ''');
         db.execute('''
           CREATE TABLE orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date TEXT,
-            supplierId INTEGER
-          )
-        ''');
-        db.execute('''
-          CREATE TABLE inventory_movements (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            productId INTEGER,
-            quantity INTEGER,
-            type TEXT,
-            date TEXT
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders (id),
+            FOREIGN KEY (product_id) REFERENCES products (id)
           )
         ''');
         db.execute('''
           CREATE TABLE locations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT
+            name TEXT NOT NULL,
+            description TEXT
           )
         ''');
         db.execute('''
           CREATE TABLE order_items (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            orderId INTEGER,
-            productId INTEGER,
-            quantity INTEGER
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders (id),
+            FOREIGN KEY (product_id) REFERENCES products (id)
           )
         ''');
       },
@@ -82,8 +93,38 @@ class DatabaseHelper {
     return await db.query('products');
   }
 
+  Future<List<Map<String, dynamic>>> getCategories() async {
+    final db = await database;
+    return await db.query('categories');
+  }
+
+  Future<List<Map<String, dynamic>>> getSuppliers() async {
+    final db = await database;
+    return await db.query('suppliers');
+  }
+
+  Future<List<Map<String, dynamic>>> getLocations() async {
+    final db = await database;
+    return await db.query('locations');
+  }
+
   Future<void> insertProduct(Map<String, dynamic> product) async {
     final db = await database;
     await db.insert('products', product);
+  }
+
+  Future<void> insertCategory(Map<String, dynamic> category) async {
+    final db = await database;
+    await db.insert('categories', category);
+  }
+
+  Future<void> insertSupplier(Map<String, dynamic> supplier) async {
+    final db = await database;
+    await db.insert('suppliers', supplier);
+  }
+
+  Future<void> insertLocation(Map<String, dynamic> location) async {
+    final db = await database;
+    await db.insert('locations', location);
   }
 }
