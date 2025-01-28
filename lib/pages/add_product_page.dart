@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:image/image.dart' as img;
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
 
@@ -86,10 +86,22 @@ class _AddProductPageState extends State<AddProductPage> {
     final pickedFile = await picker.pickImage(source: source);
 
     if (pickedFile != null) {
-      setState(() {
-        _image = File(pickedFile.path);
-        _fotoController.text = base64Encode(_image!.readAsBytesSync());
-      });
+      final imageFile = File(pickedFile.path);
+      final imageBytes = await imageFile.readAsBytes();
+      final img.Image? originalImage = img.decodeImage(imageBytes);
+
+      if (originalImage != null) {
+        final img.Image resizedImage = img.copyResize(
+          originalImage,
+          height: 300,
+        );
+
+        final resizedImageBytes = img.encodeJpg(resizedImage);
+        setState(() {
+          _image = imageFile;
+          _fotoController.text = base64Encode(resizedImageBytes);
+        });
+      }
     }
   }
 
@@ -322,7 +334,8 @@ class _AddProductPageState extends State<AddProductPage> {
                       'supplier_id': _selectedSupplierId,
                       'stock': int.parse(_stockQuantityController.text),
                       'location_id': _selectedLocationId,
-                      'expirity_date': _expirityDateController.text
+                      'expirity_date': _expirityDateController.text,
+                      'foto': _fotoController.text,
                     };
 
                     // Guardar en la base de datos local

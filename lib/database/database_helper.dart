@@ -90,7 +90,11 @@ class DatabaseHelper {
 
   Future<List<Map<String, dynamic>>> getProducts() async {
     final db = await database;
-    return await db.query('products');
+    return await db.rawQuery('''
+      SELECT p.*, l.name as location_name
+      FROM products p
+      LEFT JOIN locations l ON p.location_id = l.id
+    ''');
   }
 
   Future<List<Map<String, dynamic>>> getCategories() async {
@@ -126,5 +130,117 @@ class DatabaseHelper {
   Future<void> insertLocation(Map<String, dynamic> location) async {
     final db = await database;
     await db.insert('locations', location);
+  }
+
+  Future<void> insertOrder(Map<String, dynamic> order) async {
+    final db = await database;
+    final orderId = await db.insert('orders', {'date': order['date']});
+    for (var product in order['products']) {
+      await db.insert('order_items', {
+        'order_id': orderId,
+        'product_id': product['id'],
+        'quantity': product['quantity'],
+      });
+    }
+  }
+
+  Future<void> updateProduct(Map<String, dynamic> product) async {
+    final db = await database;
+    await db.update(
+      'products',
+      product,
+      where: 'id = ?',
+      whereArgs: [product['id']],
+    );
+  }
+
+  Future<void> updateCategory(Map<String, dynamic> category) async {
+    final db = await database;
+    await db.update(
+      'categories',
+      category,
+      where: 'id = ?',
+      whereArgs: [category['id']],
+    );
+  }
+
+  Future<void> updateSupplier(Map<String, dynamic> supplier) async {
+    final db = await database;
+    await db.update(
+      'suppliers',
+      supplier,
+      where: 'id = ?',
+      whereArgs: [supplier['id']],
+    );
+  }
+
+  Future<void> updateLocation(Map<String, dynamic> location) async {
+    final db = await database;
+    await db.update(
+      'locations',
+      location,
+      where: 'id = ?',
+      whereArgs: [location['id']],
+    );
+  }
+
+  Future<void> deleteProduct(int id) async {
+    final db = await database;
+    await db.delete('products', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> deleteCategory(int id) async {
+    final db = await database;
+    await db.delete('categories', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> deleteSupplier(int id) async {
+    final db = await database;
+    await db.delete('suppliers', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<void> deleteLocation(int id) async {
+    final db = await database;
+    await db.delete('locations', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<List<Map<String, dynamic>>> getProductsByCategory(int categoryId) async {
+    final db = await database;
+    return await db.query(
+      'products',
+      where: 'category_id = ?',
+      whereArgs: [categoryId],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getProductsBySupplier(int supplierId) async {
+    final db = await database;
+    return await db.query(
+      'products',
+      where: 'supplier_id = ?',
+      whereArgs: [supplierId],
+    );
+  }
+
+  Future<List<Map<String, dynamic>>> getProductsByLocation(int locationId) async {
+    final db = await database;
+    return await db.query(
+      'products',
+      where: 'location_id = ?',
+      whereArgs: [locationId],
+    );
+  }
+
+  Future<Map<String, dynamic>?> getProductByName(String name) async {
+    final db = await database;
+    final result = await db.query(
+      'products',
+      where: 'name = ?',
+      whereArgs: [name],
+    );
+    if (result.isNotEmpty) {
+      return result.first;
+    }
+    return null;
   }
 }
