@@ -20,7 +20,7 @@ class DatabaseHelper {
     return await openDatabase(
       path,
       version: 1,
-      onCreate: (db, version) {
+      onCreate: (db, version) async {
         db.execute('''
           CREATE TABLE products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,12 +58,8 @@ class DatabaseHelper {
         db.execute('''
           CREATE TABLE orders (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            order_id INTEGER NOT NULL,
-            product_id INTEGER NOT NULL,
-            quantity INTEGER NOT NULL,
-            price REAL NOT NULL,
-            FOREIGN KEY (order_id) REFERENCES orders (id),
-            FOREIGN KEY (product_id) REFERENCES products (id)
+            order_date TEXT NOT NULL,
+            totalOrden REAL NOT NULL
           )
         ''');
         db.execute('''
@@ -84,8 +80,31 @@ class DatabaseHelper {
             FOREIGN KEY (product_id) REFERENCES products (id)
           )
         ''');
+        await _insertTestData(db);
       },
     );
+  }
+
+  Future<void> _insertTestData(Database db) async {
+    // Insert categories
+    await db.insert('categories', {'name': 'Category 1', 'description': 'Description 1', 'foto': 'foto1.png'});
+    await db.insert('categories', {'name': 'Category 2', 'description': 'Description 2', 'foto': 'foto2.png'});
+    await db.insert('categories', {'name': 'Category 3', 'description': 'Description 3', 'foto': 'foto3.png'});
+
+    // Insert suppliers
+    await db.insert('suppliers', {'name': 'Supplier 1', 'contact_name': 'Contact 1', 'contact_email': 'contact1@example.com', 'contact_phone': '1234567890', 'address': 'Address 1', 'foto': 'foto1.png'});
+    await db.insert('suppliers', {'name': 'Supplier 2', 'contact_name': 'Contact 2', 'contact_email': 'contact2@example.com', 'contact_phone': '1234567891', 'address': 'Address 2', 'foto': 'foto2.png'});
+    await db.insert('suppliers', {'name': 'Supplier 3', 'contact_name': 'Contact 3', 'contact_email': 'contact3@example.com', 'contact_phone': '1234567892', 'address': 'Address 3', 'foto': 'foto3.png'});
+
+    // Insert locations
+    await db.insert('locations', {'name': 'Location 1', 'description': 'Description 1'});
+    await db.insert('locations', {'name': 'Location 2', 'description': 'Description 2'});
+    await db.insert('locations', {'name': 'Location 3', 'description': 'Description 3'});
+
+    // Insert products
+    await db.insert('products', {'name': 'Product 1', 'description': 'Description 1', 'price': 10.0, 'weight': '1kg', 'category_id': 1, 'supplier_id': 1, 'location_id': 1, 'foto': 'foto1.png', 'stock': 100, 'expirity_date': '2023-12-31'});
+    await db.insert('products', {'name': 'Product 2', 'description': 'Description 2', 'price': 20.0, 'weight': '2kg', 'category_id': 2, 'supplier_id': 2, 'location_id': 2, 'foto': 'foto2.png', 'stock': 200, 'expirity_date': '2023-12-31'});
+    await db.insert('products', {'name': 'Product 3', 'description': 'Description 3', 'price': 30.0, 'weight': '3kg', 'category_id': 3, 'supplier_id': 3, 'location_id': 3, 'foto': 'foto3.png', 'stock': 300, 'expirity_date': '2023-12-31'});
   }
 
   Future<List<Map<String, dynamic>>> getProducts() async {
@@ -134,12 +153,20 @@ class DatabaseHelper {
 
   Future<void> insertOrder(Map<String, dynamic> order) async {
     final db = await database;
-    final orderId = await db.insert('orders', {'date': order['date']});
+    double totalOrden = 0.0;
+    for (var product in order['products']) {
+      totalOrden += product['quantity'] * product['price'];
+    }
+    final orderId = await db.insert('orders', {
+      'order_date': order['date'],
+      'totalOrden': totalOrden,
+    });
     for (var product in order['products']) {
       await db.insert('order_items', {
         'order_id': orderId,
         'product_id': product['id'],
         'quantity': product['quantity'],
+        'price': product['price'],
       });
     }
   }
@@ -184,6 +211,15 @@ class DatabaseHelper {
     );
   }
 
+  Future<void> updateProductStock(int productId, int quantity) async {
+    final db = await database;
+    await db.rawUpdate('''
+      UPDATE products
+      SET stock = stock - ?
+      WHERE id = ?
+    ''', [quantity, productId]);
+  }
+
   Future<void> deleteProduct(int id) async {
     final db = await database;
     await db.delete('products', where: 'id = ?', whereArgs: [id]);
@@ -204,7 +240,8 @@ class DatabaseHelper {
     await db.delete('locations', where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<Map<String, dynamic>>> getProductsByCategory(int categoryId) async {
+  Future<List<Map<String, dynamic>>> getProductsByCategory(
+      int categoryId) async {
     final db = await database;
     return await db.query(
       'products',
@@ -213,7 +250,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getProductsBySupplier(int supplierId) async {
+  Future<List<Map<String, dynamic>>> getProductsBySupplier(
+      int supplierId) async {
     final db = await database;
     return await db.query(
       'products',
@@ -222,7 +260,8 @@ class DatabaseHelper {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getProductsByLocation(int locationId) async {
+  Future<List<Map<String, dynamic>>> getProductsByLocation(
+      int locationId) async {
     final db = await database;
     return await db.query(
       'products',
@@ -242,5 +281,23 @@ class DatabaseHelper {
       return result.first;
     }
     return null;
+  }
+
+  Future<List<Map<String, dynamic>>> getOrdersWithItems() async {
+    final db = await database;
+    final orders = await db.query('orders');
+    List<Map<String, dynamic>> ordersWithItems = [];
+    for (var order in orders) {
+      Map<String, dynamic> orderCopy = Map<String, dynamic>.from(order);
+      final orderItems = await db.rawQuery('''
+        SELECT oi.*, p.name as product_name
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      ''', [order['id']]);
+      orderCopy['items'] = orderItems;
+      ordersWithItems.add(orderCopy);
+    }
+    return ordersWithItems;
   }
 }

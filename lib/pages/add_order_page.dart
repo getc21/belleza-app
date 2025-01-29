@@ -1,8 +1,10 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
-import 'package:flutter_beep/flutter_beep.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 
 class AddOrderPage extends StatefulWidget {
   const AddOrderPage({super.key});
@@ -30,9 +32,19 @@ class _AddOrderPageState extends State<AddOrderPage> {
       final product = await dbHelper.getProductByName(productName!);
       if (product != null) {
         setState(() {
-          _products.add(product);
+          if (!_products.any((p) => p['id'] == product['id'])) {
+            _products.add({
+              'id': product['id'],
+              'name': product['name'],
+              'quantity': 1, // Inicializa la cantidad en 1
+              'price': product['price'],
+            });
+            log('Product added: ${product['name']}');
+            FlutterRingtonePlayer().play(
+              fromAsset: 'assets/img/beep.mp3',
+            );
+          }
         });
-        FlutterBeep.beep();
       }
     });
   }
@@ -57,6 +69,12 @@ class _AddOrderPageState extends State<AddOrderPage> {
       'date': DateTime.now().toString(),
     };
     await dbHelper.insertOrder(newOrder);
+
+    // Update product stock
+    for (var product in _products) {
+      await dbHelper.updateProductStock(product['id'], product['quantity']);
+    }
+
     Get.back();
   }
 

@@ -47,8 +47,8 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   image_picker: ^1.1.2
-  qr_code_scanner: ^1.0.1
-  flutter_beep: ^1.0.0
+  qr_code_scanner_plus: ^2.0.9+1
+  flutter_ringtone_player: ^4.0.0+3
 dev_dependencies:
   flutter_test:
     sdk: flutter
