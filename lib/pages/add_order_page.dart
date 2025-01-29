@@ -1,5 +1,7 @@
 import 'dart:developer';
 
+import 'package:belleza_app/controllers/indexpage_controller.dart';
+import 'package:belleza_app/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:belleza_app/database/database_helper.dart';
@@ -18,7 +20,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
   QRViewController? controller;
   List<Map<String, dynamic>> _products = [];
   final dbHelper = DatabaseHelper();
-
+  final ipc = Get.find<IndexPageController>();
   @override
   void dispose() {
     controller?.dispose();
@@ -37,7 +39,7 @@ class _AddOrderPageState extends State<AddOrderPage> {
               'id': product['id'],
               'name': product['name'],
               'quantity': 1, // Inicializa la cantidad en 1
-              'price': product['price'],
+              'price': product['sale_price'],
             });
             log('Product added: ${product['name']}');
             FlutterRingtonePlayer().play(
@@ -74,8 +76,9 @@ class _AddOrderPageState extends State<AddOrderPage> {
     for (var product in _products) {
       await dbHelper.updateProductStock(product['id'], product['quantity']);
     }
-
-    Get.back();
+    await controller?.pauseCamera();
+    ipc.setIndexPage(4);
+    Get.to(() => HomePage());
   }
 
   @override

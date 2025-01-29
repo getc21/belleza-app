@@ -49,6 +49,9 @@ dependencies:
   image_picker: ^1.1.2
   qr_code_scanner_plus: ^2.0.9+1
   flutter_ringtone_player: ^4.0.0+3
+  flutter_riverpod: ^2.6.1
+  loading_overlay: ^0.4.2
+  flutter_spinkit: ^5.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -62,7 +62,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                   if (imageBytes != null)
                     Image.memory(imageBytes, height: 50, width: 50, fit: BoxFit.cover)
                   else
-                    Image.asset('assets/img/default_image.png', height: 50, width: 50, fit: BoxFit.cover),
+                    Image.asset('assets/img/no-photo.jpg', height: 50, width: 50, fit: BoxFit.cover),
                   const SizedBox(width: 16.0), // Espaciado entre la imagen y el texto
                   // Texto
                   Expanded(

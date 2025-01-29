@@ -1,5 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
-
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 class Utils {
   // static Color? colorFondoClaro = Colors.grey[100];
   // static Color? primaryColor = const Color.fromRGBO(15, 16, 53, 1);
@@ -18,5 +19,16 @@ class Utils {
   static get espacio50 => const Gap(50.0);
   static get espacio55 => const Gap(55.0);
   static get espacio60 => const Gap(60.0);
-
+  static loadingCustom([double? size]) => Center(
+        child: Column(
+          mainAxisAlignment:
+              MainAxisAlignment.center, 
+          children: [
+            SpinKitSpinningLines(
+              color: Colors.pink,
+              size: size ?? 120.0,
+            ),
+          ],
+        ),
+      );
 }

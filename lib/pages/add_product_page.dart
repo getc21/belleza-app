@@ -19,7 +19,8 @@ class _AddProductPageState extends State<AddProductPage> {
   final formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _priceController = TextEditingController();
+  final _priceCompraController = TextEditingController();
+  final _priceVentaController = TextEditingController();
   final _weightController = TextEditingController();
   int? _selectedCategoryId;
   int? _selectedSupplierId;
@@ -185,29 +186,12 @@ class _AddProductPageState extends State<AddProductPage> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      controller: _priceController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Precio',
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor ingrese el precio';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                    child: TextFormField(
                       controller: _weightController,
                       decoration: InputDecoration(
                         border: OutlineInputBorder(),
-                        labelText: 'Peso',
+                        labelText: 'Tamaño',
                       ),
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.text,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor ingrese el peso';
@@ -228,6 +212,45 @@ class _AddProductPageState extends State<AddProductPage> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor ingrese la cantidad en stock';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Utils.espacio10,
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      controller: _priceCompraController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Precio de compra',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese el precio de compra';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: TextFormField(
+                      controller: _priceVentaController,
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Precio de venta',
+                      ),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Por favor ingrese el precio de venta';
                         }
                         return null;
                       },
@@ -328,7 +351,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     final newProduct = {
                       'name': _nameController.text,
                       'description': _descriptionController.text,
-                      'price': double.parse(_priceController.text),
+                      'purchase_price': double.parse(_priceCompraController.text),
+                      'sale_price': double.parse(_priceVentaController.text),
                       'weight': _weightController.text,
                       'category_id': _selectedCategoryId,
                       'supplier_id': _selectedSupplierId,

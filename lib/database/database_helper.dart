@@ -26,7 +26,8 @@ class DatabaseHelper {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
             description TEXT,  
-            price REAL,
+            purchase_price REAL,
+            sale_price REAL,
             weight TEXT,
             category_id INTEGER NOT NULL,
             supplier_id INTEGER NOT NULL,
@@ -102,19 +103,24 @@ class DatabaseHelper {
     await db.insert('locations', {'name': 'Location 3', 'description': 'Description 3'});
 
     // Insert products
-    await db.insert('products', {'name': 'Product 1', 'description': 'Description 1', 'price': 10.0, 'weight': '1kg', 'category_id': 1, 'supplier_id': 1, 'location_id': 1, 'foto': 'foto1.png', 'stock': 100, 'expirity_date': '2023-12-31'});
-    await db.insert('products', {'name': 'Product 2', 'description': 'Description 2', 'price': 20.0, 'weight': '2kg', 'category_id': 2, 'supplier_id': 2, 'location_id': 2, 'foto': 'foto2.png', 'stock': 200, 'expirity_date': '2023-12-31'});
-    await db.insert('products', {'name': 'Product 3', 'description': 'Description 3', 'price': 30.0, 'weight': '3kg', 'category_id': 3, 'supplier_id': 3, 'location_id': 3, 'foto': 'foto3.png', 'stock': 300, 'expirity_date': '2023-12-31'});
+    await db.insert('products', {'name': 'Product 1', 'description': 'Description 1', 'purchase_price': 8.0, 'sale_price': 10.0, 'weight': '1kg', 'category_id': 1, 'supplier_id': 1, 'location_id': 1, 'foto': 'foto1.png', 'stock': 100, 'expirity_date': '2023-12-31'});
+    await db.insert('products', {'name': 'Product 2', 'description': 'Description 2', 'purchase_price': 16.0, 'sale_price': 20.0, 'weight': '2kg', 'category_id': 2, 'supplier_id': 2, 'location_id': 2, 'foto': 'foto2.png', 'stock': 200, 'expirity_date': '2023-12-31'});
+    await db.insert('products', {'name': 'Product 3', 'description': 'Description 3', 'purchase_price': 22.0, 'sale_price': 30.0, 'weight': '3kg', 'category_id': 3, 'supplier_id': 3, 'location_id': 3, 'foto': 'foto3.png', 'stock': 300, 'expirity_date': '2023-12-31'});
   }
 
   Future<List<Map<String, dynamic>>> getProducts() async {
-    final db = await database;
-    return await db.rawQuery('''
-      SELECT p.*, l.name as location_name
-      FROM products p
-      LEFT JOIN locations l ON p.location_id = l.id
-    ''');
-  }
+  final db = await database;
+  return await db.rawQuery('''
+    SELECT p.*, 
+           c.name as category_name, 
+           s.name as supplier_name, 
+           l.name as location_name
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    LEFT JOIN suppliers s ON p.supplier_id = s.id
+    LEFT JOIN locations l ON p.location_id = l.id
+  ''');
+}
 
   Future<List<Map<String, dynamic>>> getCategories() async {
     final db = await database;
