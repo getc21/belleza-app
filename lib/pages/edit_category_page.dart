@@ -1,4 +1,5 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
@@ -6,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:image/image.dart' as img;
+
 class EditCategoryPage extends StatefulWidget {
   final Map<String, dynamic> category;
 
@@ -26,7 +28,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.category['name']);
-    _descriptionController = TextEditingController(text: widget.category['description']);
+    _descriptionController =
+        TextEditingController(text: widget.category['description']);
     _fotoController = TextEditingController(text: widget.category['foto']);
   }
 
@@ -57,8 +60,11 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Editar Categoría'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -69,6 +75,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -83,6 +91,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Descripción',
                 ),
@@ -97,6 +107,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -105,22 +116,21 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                   children: [
                     Text(
                       'Cargar imagen',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera),
-                          label: Text('Cámara'),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Galería'),
-                        ),
+                        Utils.elevatedButtonWithIcon(
+                            'Cámara', Utils.colorBotones, () {
+                          _pickImage(ImageSource.camera);
+                        }, Icons.camera),
+                        Utils.elevatedButtonWithIcon(
+                            'Galería', Utils.colorBotones, () {
+                          _pickImage(ImageSource.gallery);
+                        }, Icons.photo_library),
                       ],
                     ),
                     if (_image != null) ...[
@@ -131,9 +141,8 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+              Utils.elevatedButton('Actualizar', Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final updatedCategory = {
                       'id': widget.category['id'],
                       'name': _nameController.text,
@@ -146,9 +155,7 @@ class _EditCategoryPageState extends State<EditCategoryPage> {
 
                     Get.to(HomePage()); // Cerrar la página
                   }
-                },
-                child: Text('Actualizar'),
-              ),
+              }),
             ],
           ),
         ),

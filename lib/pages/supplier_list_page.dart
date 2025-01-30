@@ -4,6 +4,7 @@ import 'package:belleza_app/database/database_helper.dart';
 import 'package:belleza_app/pages/add_supplier_page.dart';
 import 'package:belleza_app/pages/edit_supplier_page.dart';
 import 'package:belleza_app/pages/supplier_products_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -42,6 +43,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       body: ListView.builder(
         itemCount: _suppliers.length,
         itemBuilder: (context, index) {
@@ -63,7 +65,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
               ));
             },
             child: Card(
-              color: Colors.pink[100], // Color de fondo del Card
+              color: Utils.colorFondoCards, // Color de fondo del Card
               margin: const EdgeInsets.symmetric(
                   vertical: 8.0, horizontal: 12.0), // Márgenes del Card
               shape: RoundedRectangleBorder(

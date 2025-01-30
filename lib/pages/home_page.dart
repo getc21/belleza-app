@@ -5,6 +5,7 @@ import 'package:belleza_app/pages/location_list_page.dart';
 import 'package:belleza_app/pages/order_list_page.dart';
 import 'package:belleza_app/pages/product_list_page.dart';
 import 'package:belleza_app/pages/report_page.dart';
+import 'package:belleza_app/pages/sales_history_page.dart';
 import 'package:belleza_app/pages/supplier_list_page.dart';
 import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
           child: Scaffold(
             appBar: AppBar(
               foregroundColor: Colors.white,
-              backgroundColor: Colors.pink.shade300,
+              backgroundColor: Utils.colorGnav,
               title: Text('Control de Almacenes'),
               centerTitle: true,
               actions: [
@@ -90,7 +91,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   DrawerHeader(
                     decoration: BoxDecoration(
-                      color: Colors.pink.shade300,
+                      color: Utils.colorGnav,
                     ),
                     child: Text(
                       'Estadísticas',
@@ -108,18 +109,26 @@ class _HomePageState extends State<HomePage> {
                       Get.to(ReportPage());
                     },
                   ),
+                  ListTile(
+                    leading: Icon(Icons.monetization_on),
+                    title: Text('Reporte de ventas'),
+                    onTap: () {
+                      Navigator.pop(context); // Cierra el drawer
+                      Get.to(SalesHistoryPage());
+                    },
+                  ),
                 ],
               ),
             ),
             body: widgetOptions.elementAt(ipc.getIndexPage),
             bottomNavigationBar: SafeArea(
               child: Container(
-                color: Colors.pink[300],
+                color: Utils.colorGnav,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 15.0, vertical: 10.0),
                   child: GNav(
-                    backgroundColor: Colors.pink.shade300,
+                    backgroundColor: Utils.colorGnav,
                     color: Colors.white,
                     activeColor: Colors.white,
                     tabBackgroundColor: Colors.pink.shade400,

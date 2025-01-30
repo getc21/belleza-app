@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:belleza_app/pages/add_product_page.dart';
 import 'package:belleza_app/pages/edit_product_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:barcode_widget/barcode_widget.dart';
@@ -58,11 +59,13 @@ class ProductListPageState extends State<ProductListPage> {
           final description = product['description'].toLowerCase();
           final category = product['category_name']?.toLowerCase() ?? '';
           final supplier = product['supplier_name']?.toLowerCase() ?? '';
+          final location = product['location_name']?.toLowerCase() ?? '';
           final searchLower = searchText.toLowerCase();
           return name.contains(searchLower) ||
               description.contains(searchLower) ||
               category.contains(searchLower) ||
-              supplier.contains(searchLower);
+              supplier.contains(searchLower)||
+              location.contains(searchLower);
         }).toList();
       } else {
         _filteredProducts = _allProducts;
@@ -70,35 +73,57 @@ class ProductListPageState extends State<ProductListPage> {
     });
   }
 
+  void _showAllProducts() {
+    setState(() {
+      _filteredProducts = _allProducts;
+    });
+  }
+
+  void _showNearExpiryProducts() {
+    setState(() {
+      _filteredProducts = _allProducts.where((product) {
+        final expiryDate = DateTime.tryParse(product['expirity_date'] ?? '');
+        return expiryDate != null &&
+            expiryDate.difference(DateTime.now()).inDays <= 30;
+      }).toList();
+    });
+  }
+
+  void _showLowStockProducts() {
+    setState(() {
+      _filteredProducts = _allProducts.where((product) {
+        final stock = product['stock'] ?? 0;
+        return stock < 10;
+      }).toList();
+    });
+  }
+
   void _showAddStockDialog(int productId) {
-    final _stockController = TextEditingController();
+    final stockController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Utils.colorFondoCards,
           title: Text('Añadir Stock'),
           content: TextField(
-            controller: _stockController,
+            controller: stockController,
             keyboardType: TextInputType.number,
-            decoration: InputDecoration(hintText: 'Cantidad de stock a añadir'),
+            decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: 'Cantidad de stock a añadir'),
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final int stockToAdd = int.parse(_stockController.text);
+            Utils.elevatedButton('Cancelar', Utils.no, () {
+              Navigator.of(context).pop();
+            }),
+            Utils.elevatedButton('Añadir', Utils.yes, () async {
+              final int stockToAdd = int.parse(stockController.text);
                 await dbHelper.addProductStock(productId, stockToAdd);
                 _loadProducts();
                 Navigator.of(context).pop();
-              },
-              child: Text('Añadir'),
-            ),
+            }),
           ],
         );
       },
@@ -108,300 +133,315 @@ class ProductListPageState extends State<ProductListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.pink[100],
-      body: Stack(
+      backgroundColor: Utils.colorFondo,
+      body: Column(
         children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(8),
-            child: Wrap(
-              spacing: 8, // Espaciado horizontal entre elementos
-              runSpacing: 8, // Espaciado vertical entre filas
-              children: _filteredProducts.map((product) {
-                final stock = product['stock'] ?? 0;
-                final expiryDate =
-                    DateTime.tryParse(product['expirity_date'] ?? '');
-                final isLowStock = stock < 10;
-                final isNearExpiry = expiryDate != null &&
-                    expiryDate.difference(DateTime.now()).inDays <= 30;
-                final weight = product['weight'] ?? '';
-                final locationName =
-                    product['location_name'] ?? 'Sin ubicación';
-                final purchasePrice = product['purchase_price'] ?? 0.0;
-                final salePrice = product['sale_price'] ?? 0.0;
-                final fotoBase64 = product['foto'] ?? '';
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Utils.elevatedButton('Todos', Utils.colorBotones, () {
+                  _showAllProducts();
+                }),
+                Utils.elevatedButton('Caducidad prox.', Utils.colorBotones, () {
+                  _showNearExpiryProducts();
+                }),
+                Utils.elevatedButton('Stock bajo', Utils.colorBotones, () {
+                  _showLowStockProducts();
+                }),
+              ],
+            ),
+          ),
+          Expanded(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(8),
+                  child: Wrap(
+                    spacing: 8, // Espaciado horizontal entre elementos
+                    runSpacing: 8, // Espaciado vertical entre filas
+                    children: _filteredProducts.map((product) {
+                      final stock = product['stock'] ?? 0;
+                      final expiryDate =
+                          DateTime.tryParse(product['expirity_date'] ?? '');
+                      final isLowStock = stock < 10;
+                      final isNearExpiry = expiryDate != null &&
+                          expiryDate.difference(DateTime.now()).inDays <= 30;
+                      final weight = product['weight'] ?? '';
+                      final locationName =
+                          product['location_name'] ?? 'Sin ubicación';
+                      final purchasePrice = product['purchase_price'] ?? 0.0;
+                      final salePrice = product['sale_price'] ?? 0.0;
+                      final fotoBase64 = product['foto'] ?? '';
 
-                Uint8List? imageBytes;
-                if (fotoBase64.isNotEmpty) {
-                  try {
-                    imageBytes = base64Decode(fotoBase64);
-                  } catch (e) {
-                    imageBytes = null; // Si ocurre un error, asigna null
-                  }
-                }
-                return Container(
-                  width: MediaQuery.of(context).size.width * 0.45, // Ajusta el ancho
-                  decoration: BoxDecoration(
-                    color: Colors.pink[50],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade300),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Imagen con iconos
-                      Stack(
-                        alignment: Alignment.topRight,
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(8),
-                              ),
+                      Uint8List? imageBytes;
+                      if (fotoBase64.isNotEmpty) {
+                        try {
+                          imageBytes = base64Decode(fotoBase64);
+                        } catch (e) {
+                          imageBytes = null; // Si ocurre un error, asigna null
+                        }
+                      }
+                      return Container(
+                        width: MediaQuery.of(context).size.width *
+                            0.45, // Ajusta el ancho
+                        decoration: BoxDecoration(
+                          color: Utils.colorFondoCards,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade300),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
                             ),
-                            child: ClipRRect(
-                              borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(8),
-                              ),
-                              child: imageBytes != null
-                                  ? Image.memory(
-                                      imageBytes,
-                                      height: 132,
-                                      width: double.infinity,
-                                      fit: BoxFit.fill,
-                                    )
-                                  : Image.asset(
-                                      'assets/img/perfume.webp',
-                                      fit: BoxFit.fill,
-                                      height: 130,
-                                      width: double.infinity,
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Imagen con iconos
+                            Stack(
+                              alignment: Alignment.topRight,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade200,
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(8),
                                     ),
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(8),
+                                    ),
+                                    child: imageBytes != null
+                                        ? Image.memory(
+                                            imageBytes,
+                                            height: 132,
+                                            width: double.infinity,
+                                            fit: BoxFit.fill,
+                                          )
+                                        : Image.asset(
+                                            'assets/img/perfume.webp',
+                                            fit: BoxFit.fill,
+                                            height: 130,
+                                            width: double.infinity,
+                                          ),
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue, // Color de fondo
+                                        borderRadius: BorderRadius.only(
+                                            topRight: Radius.circular(
+                                                5)), // Bordes redondeados
+                                      ), // Espaciado interno
+                                      child: IconButton(
+                                        onPressed: () {
+                                          Get.to(EditProductPage(
+                                              product: product));
+                                        },
+                                        icon: const Icon(Icons.edit),
+                                        color: Colors.white, // Color del ícono
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          _showAddStockDialog(product['id']);
+                                        },
+                                        icon: const Icon(Icons.add),
+                                        color: Colors.white, // Color del ícono
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          _deleteProduct(product['id']);
+                                        },
+                                        icon: const Icon(Icons.delete),
+                                        color: Colors.white, // Color del ícono
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.blue, // Color de fondo
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(
-                                          5)), // Bordes redondeados
-                                ), // Espaciado interno
-                                child: IconButton(
-                                  onPressed: () {
-                                    Get.to(EditProductPage(product: product));
-                                  },
-                                  icon: const Icon(Icons.edit),
-                                  color: Colors.white, // Color del ícono
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: Utils.textTitle(
+                                        product['name'] ?? 'Producto'),
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.orange,
+                                Padding(
+                                  padding: EdgeInsets.all(8),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _generateAndShowPdf(
+                                          context, product['name']);
+                                    },
+                                    child: BarcodeWidget(
+                                      backgroundColor: Colors.white,
+                                      barcode: Barcode.qrCode(),
+                                      data: product['name'] ?? '',
+                                      width: 40,
+                                      height: 40,
+                                    ),
+                                  ),
                                 ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    _showAddStockDialog(product['id']);
-                                  },
-                                  icon: const Icon(Icons.add),
-                                  color: Colors.white, // Color del ícono
-                                ),
-                              ),
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    _deleteProduct(product['id']);
-                                  },
-                                  icon: const Icon(Icons.delete),
-                                  color: Colors.white, // Color del ícono
-                                ),
-                              ),
-                              
-                            ],
-                          ),
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Padding(
+                              ],
+                            ),
+
+                            Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                product['name'] ?? 'Producto',
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: Utils.textDescription(
+                                  product['description'] ?? 'Descripción'),
                             ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.all(8),
-                            child: GestureDetector(
-                              onTap: () {
-                                _generateAndShowPdf(context, product['name']);
-                              },
-                              child: BarcodeWidget(
-                                backgroundColor: Colors.white,
-                                barcode: Barcode.qrCode(),
-                                data: product['name'] ?? '',
-                                width: 40,
-                                height: 40,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          product['description'] ?? 'Descripción',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      // Fecha de vencimiento y QR
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.stretch,
+                            const SizedBox(height: 4),
+                            // Fecha de vencimiento y QR
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                      expiryDate != null
-                                          ? 'Fecha de caducidad: ${expiryDate.toLocal().toString().split(' ')[0]}'
-                                          : 'Sin fecha',
-                                      style: TextStyle(
-                                          fontSize: 12,
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        Utils.textLlaveValor(
+                                          'Fecha de caducidad: ',
+                                          expiryDate != null
+                                              ? expiryDate
+                                                  .toLocal()
+                                                  .toString()
+                                                  .split(' ')[0]
+                                              : 'Sin fecha',
                                           color: isNearExpiry
                                               ? Colors.orange
-                                              : Colors.black)),
-                                  Text(
-                                    stock != null
-                                        ? 'Stock: $stock'
-                                        : 'Sin stock',
-                                    style: TextStyle(
-                                        fontSize: 12,
-                                        color: isLowStock
-                                            ? Colors.red
-                                            : Colors.black),
-                                  ),
-                                  Text(
-                                    weight.isNotEmpty
-                                        ? 'Tamaño: $weight'
-                                        : 'Sin tamaño',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    'Ubicación: $locationName',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    'Precio de compra: $purchasePrice',
-                                    style: const TextStyle(fontSize: 12),
-                                  ),
-                                  Text(
-                                    'Precio de venta: $salePrice',
-                                    style: const TextStyle(fontSize: 12),
+                                              : Utils.defaultColor,
+                                        ),
+                                        Utils.textLlaveValor(
+                                            'Stock: ',
+                                            stock != null
+                                                ? '$stock'
+                                                : 'Sin stock',
+                                            color: isLowStock
+                                                ? Colors.red
+                                                : Utils.defaultColor),
+                                        Utils.textLlaveValor(
+                                          'Tamaño: ',
+                                          weight.isNotEmpty
+                                              ? weight
+                                              : 'Sin tamaño',
+                                        ),
+                                        Utils.textLlaveValor(
+                                            'Ubicacion: ', locationName),
+                                        Utils.textLlaveValor(
+                                          'Precio de compra: ',
+                                          purchasePrice.toString(),
+                                        ),
+                                        Utils.textLlaveValor(
+                                          'Precio de venta: ',
+                                          salePrice.toString(),
+                                        ),
+                                        Utils.espacio10
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(left: 10, top: 10),
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 300),
-                width: _isExpanded ? 400 : 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(50),
-                  border: Border.all(
-                    color: Colors.pink.shade400,
-                    width: 4,
+                      );
+                    }).toList(),
                   ),
                 ),
-                child: Row(
-                  children: [
-                    AnimatedAlign(
+                Padding(
+                  padding: EdgeInsets.only(left: 10, top: 10),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: AnimatedContainer(
                       duration: Duration(milliseconds: 300),
-                      alignment:
-                          _isExpanded ? Alignment.centerLeft : Alignment.center,
-                      child: IconButton(
-                        icon: Icon(
-                          _isExpanded ? Icons.close : Icons.search,
+                      width: _isExpanded ? 400 : 60,
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(50),
+                        border: Border.all(
                           color: Colors.pink.shade400,
-                          size: 35,
+                          width: 4,
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isExpanded = !_isExpanded;
-                          });
-                        },
+                      ),
+                      child: Row(
+                        children: [
+                          AnimatedAlign(
+                            duration: Duration(milliseconds: 300),
+                            alignment: _isExpanded
+                                ? Alignment.centerLeft
+                                : Alignment.center,
+                            child: IconButton(
+                              icon: Icon(
+                                _isExpanded ? Icons.close : Icons.search,
+                                color: Colors.pink.shade400,
+                                size: 35,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isExpanded = !_isExpanded;
+                                });
+                              },
+                            ),
+                          ),
+                          Expanded(
+                            child: AnimatedAlign(
+                              duration: Duration(milliseconds: 300),
+                              alignment: _isExpanded
+                                  ? Alignment.center
+                                  : Alignment.centerRight,
+                              child: _isExpanded
+                                  ? TextField(
+                                      controller: _searchController,
+                                      onChanged: _filterProducts,
+                                      decoration: InputDecoration(
+                                        hintText: 'Buscar un producto...',
+                                        border: InputBorder.none,
+                                      ),
+                                    )
+                                  : SizedBox.shrink(),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    Expanded(
-                      child: AnimatedAlign(
-                        duration: Duration(milliseconds: 300),
-                        alignment: _isExpanded
-                            ? Alignment.center
-                            : Alignment.centerRight,
-                        child: _isExpanded
-                            ? TextField(
-                                controller: _searchController,
-                                onChanged: _filterProducts,
-                                decoration: InputDecoration(
-                                  hintText: 'Buscar un producto...',
-                                  border: InputBorder.none,
-                                ),
-                              )
-                            : SizedBox.shrink(),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.pink[400],
+        backgroundColor: Utils.colorBotones,
         onPressed: () async {
           Get.to(AddProductPage());
         },

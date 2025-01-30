@@ -1,4 +1,5 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
@@ -47,8 +48,11 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Agregar Categoría'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -59,6 +63,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -73,6 +79,8 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Descripción',
                 ),
@@ -87,6 +95,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -101,16 +110,12 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera),
-                          label: Text('Cámara'),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Galería'),
-                        ),
+                        Utils.elevatedButtonWithIcon('Cámara', Utils.colorBotones, (){
+                          _pickImage(ImageSource.camera);
+                        }, Icons.camera),
+                        Utils.elevatedButtonWithIcon('Galería', Utils.colorBotones, (){
+                          _pickImage(ImageSource.gallery);
+                        }, Icons.camera),
                       ],
                     ),
                     if (_image != null) ...[
@@ -121,9 +126,9 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+
+              Utils.elevatedButton('Guardar',Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final newCategory = {
                       'name': _nameController.text,
                       'description': _descriptionController.text,
@@ -135,9 +140,7 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
 
                     Get.to(HomePage()); // Cerrar la página
                   }
-                },
-                child: Text('Guardar'),
-              ),
+              }),
             ],
           ),
         ),

@@ -4,6 +4,7 @@ import 'package:belleza_app/database/database_helper.dart';
 import 'package:belleza_app/pages/add_category_page.dart';
 import 'package:belleza_app/pages/category_products_page.dart';
 import 'package:belleza_app/pages/edit_category_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -41,6 +42,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       body: ListView.builder(
         itemCount: _categories.length,
         itemBuilder: (context, index) {
@@ -62,7 +64,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
               ));
             },
             child: Card(
-              color: Colors.pink[100], // Color de fondo del Card
+              color: Utils.colorFondoCards, // Color de fondo del Card
               margin: const EdgeInsets.symmetric(
                   vertical: 8.0, horizontal: 12.0), // Márgenes del Card
               shape: RoundedRectangleBorder(
@@ -159,7 +161,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.pink,
+        backgroundColor: Utils.colorBotones,
         onPressed: () async {
           Get.to(AddCategoryPage());
         },

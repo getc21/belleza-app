@@ -1,3 +1,4 @@
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:pdf/pdf.dart';
@@ -78,7 +79,10 @@ class _ReportPageState extends State<ReportPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
+        foregroundColor: Colors.white,
+        backgroundColor: Utils.colorGnav,
         title: Text('Reporte de Rotación de Productos'),
         actions: [
           IconButton(
@@ -94,52 +98,70 @@ class _ReportPageState extends State<ReportPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Rotación de Productos en la Última Semana', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  DataTable(
-                    columns: [
-                      DataColumn(label: Text('ID')),
-                      DataColumn(label: Text('Nombre')),
-                      DataColumn(label: Text('Unid. Ult. Semana')),
-                    ],
-                    rows: _weeklyRotationProducts.map((product) {
-                      return DataRow(cells: [
-                        DataCell(Text(product['id'].toString())),
-                        DataCell(Text(product['name'])),
-                        DataCell(Text(product['total_quantity'].toString())),
-                      ]);
-                    }).toList(),
+                  Text('Rotación de Productos en la Última Semana', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Utils.defaultColor)),
+                  Center(
+                    child: Container(
+                      color: Colors.white,
+                      child: DataTable(
+                        border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
+                        columns: [
+                          DataColumn(label: Text('ID')),
+                          DataColumn(label: Text('Nombre')),
+                          DataColumn(label: Text('Unid. Ult. Semana')),
+                        ],
+                        rows: _weeklyRotationProducts.map((product) {
+                          return DataRow(cells: [
+                            DataCell(Center(child: Text(product['id'].toString()))),
+                            DataCell(Center(child: Text(product['name']))),
+                            DataCell(Center(child: Text(product['total_quantity'].toString()))),
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20),
-                  Text('Rotación de Productos en los Últimos 30 Días', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  DataTable(
-                    columns: [
-                      DataColumn(label: Text('ID')),
-                      DataColumn(label: Text('Nombre')),
-                      DataColumn(label: Text('Unid. Ult. 30 días')),
-                    ],
-                    rows: _monthlyRotationProducts.map((product) {
-                      return DataRow(cells: [
-                        DataCell(Text(product['id'].toString())),
-                        DataCell(Text(product['name'])),
-                        DataCell(Text(product['total_quantity'].toString())),
-                      ]);
-                    }).toList(),
+                  Text('Rotación de Productos en los Últimos 30 Días', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Utils.defaultColor)),
+                  Center(
+                    child: Container(
+                      color: Colors.white,
+                      child: DataTable(
+                        border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
+                        columns: [
+                          DataColumn(label: Text('ID')),
+                          DataColumn(label: Text('Nombre')),
+                          DataColumn(label: Text('Unid. Ult. 30 días')),
+                        ],
+                        rows: _monthlyRotationProducts.map((product) {
+                          return DataRow(cells: [
+                            DataCell(Center(child: Text(product['id'].toString()))),
+                            DataCell(Center(child: Text(product['name']))),
+                            DataCell(Center(child: Text(product['total_quantity'].toString()))),
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
                   ),
                   SizedBox(height: 20),
-                  Text('Rotación de Productos en el Último Año', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  DataTable(
-                    columns: [
-                      DataColumn(label: Text('ID')),
-                      DataColumn(label: Text('Nombre')),
-                      DataColumn(label: Text('Unid. Ult. Año')),
-                    ],
-                    rows: _yearlyRotationProducts.map((product) {
-                      return DataRow(cells: [
-                        DataCell(Text(product['id'].toString())),
-                        DataCell(Text(product['name'])),
-                        DataCell(Text(product['total_quantity'].toString())),
-                      ]);
-                    }).toList(),
+                  Text('Rotación de Productos en el Último Año', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Utils.defaultColor)),
+                  Center(
+                    child: Container(
+                      color: Colors.white,
+                      child: DataTable(
+                        border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
+                        columns: [
+                          DataColumn(label: Text('ID')),
+                          DataColumn(label: Text('Nombre')),
+                          DataColumn(label: Text('Unid. Ult. Año')),
+                        ],
+                        rows: _yearlyRotationProducts.map((product) {
+                          return DataRow(cells: [
+                            DataCell(Center(child: Text(product['id'].toString()))),
+                            DataCell(Center(child: Text(product['name']))),
+                            DataCell(Center(child: Text(product['total_quantity'].toString()))),
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
                   ),
                 ],
               ),
