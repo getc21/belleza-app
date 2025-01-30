@@ -4,6 +4,7 @@ import 'package:belleza_app/pages/category_list_page.dart';
 import 'package:belleza_app/pages/location_list_page.dart';
 import 'package:belleza_app/pages/order_list_page.dart';
 import 'package:belleza_app/pages/product_list_page.dart';
+import 'package:belleza_app/pages/report_page.dart';
 import 'package:belleza_app/pages/supplier_list_page.dart';
 import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -70,6 +71,45 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Colors.pink.shade300,
               title: Text('Control de Almacenes'),
               centerTitle: true,
+              actions: [
+                Builder(
+                  builder: (context) {
+                    return IconButton(
+                      icon: Icon(Icons.bar_chart),
+                      onPressed: () {
+                        Scaffold.of(context).openEndDrawer();
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+            endDrawer: Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  DrawerHeader(
+                    decoration: BoxDecoration(
+                      color: Colors.pink.shade300,
+                    ),
+                    child: Text(
+                      'Estadísticas',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                      ),
+                    ),
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.insert_chart),
+                    title: Text('Reporte de Rotación de Productos'),
+                    onTap: () {
+                      Navigator.pop(context); // Cierra el drawer
+                      Get.to(ReportPage());
+                    },
+                  ),
+                ],
+              ),
             ),
             body: widgetOptions.elementAt(ipc.getIndexPage),
             bottomNavigationBar: SafeArea(

@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-
+import 'dart:math';
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._();
   static Database? _database;
@@ -85,8 +85,24 @@ class DatabaseHelper {
       },
     );
   }
-
+ // Insert products
   Future<void> _insertTestData(Database db) async {
+    for (int i = 1; i <= 20; i++) {
+      await db.insert('products', {
+        'name': 'Product $i',
+        'description': 'Description $i',
+        'purchase_price': (i * 2.0) + 5.0,
+        'sale_price': (i * 2.5) + 10.0,
+        'weight': '${i}kg',
+        'category_id': (i % 3) + 1,
+        'supplier_id': (i % 3) + 1,
+        'location_id': (i % 3) + 1,
+        'foto': 'foto$i.png',
+        'stock': 100 + i * 10,
+        'expirity_date': '2023-12-31'
+      });
+    }
+
     // Insert categories
     await db.insert('categories', {'name': 'Category 1', 'description': 'Description 1', 'foto': 'foto1.png'});
     await db.insert('categories', {'name': 'Category 2', 'description': 'Description 2', 'foto': 'foto2.png'});
@@ -102,12 +118,49 @@ class DatabaseHelper {
     await db.insert('locations', {'name': 'Location 2', 'description': 'Description 2'});
     await db.insert('locations', {'name': 'Location 3', 'description': 'Description 3'});
 
-    // Insert products
-    await db.insert('products', {'name': 'Product 1', 'description': 'Description 1', 'purchase_price': 8.0, 'sale_price': 10.0, 'weight': '1kg', 'category_id': 1, 'supplier_id': 1, 'location_id': 1, 'foto': 'foto1.png', 'stock': 100, 'expirity_date': '2023-12-31'});
-    await db.insert('products', {'name': 'Product 2', 'description': 'Description 2', 'purchase_price': 16.0, 'sale_price': 20.0, 'weight': '2kg', 'category_id': 2, 'supplier_id': 2, 'location_id': 2, 'foto': 'foto2.png', 'stock': 200, 'expirity_date': '2023-12-31'});
-    await db.insert('products', {'name': 'Product 3', 'description': 'Description 3', 'purchase_price': 22.0, 'sale_price': 30.0, 'weight': '3kg', 'category_id': 3, 'supplier_id': 3, 'location_id': 3, 'foto': 'foto3.png', 'stock': 300, 'expirity_date': '2023-12-31'});
-  }
 
+    // Insert orders and order_items
+    final random = Random();
+    final now = DateTime.now();
+    for (int i = 0; i < 50; i++) {
+      final orderDate = now.subtract(Duration(days: random.nextInt(180))).toIso8601String();
+      final orderId = await db.insert('orders', {
+        'order_date': orderDate,
+        'totalOrden': 0.0, // Placeholder, will be updated later
+      });
+
+      double totalOrden = 0.0;
+      final numItems = random.nextInt(5) + 1; // Each order has between 1 and 5 items
+      for (int j = 0; j < numItems; j++) {
+        final productId = random.nextInt(20) + 1; // Assuming there are 3 products
+        final quantity = random.nextInt(10) + 1;
+        final price = (await db.query('products', where: 'id = ?', whereArgs: [productId])).first['sale_price'] as double;
+        totalOrden += quantity * price;
+
+        await db.insert('order_items', {
+          'order_id': orderId,
+          'product_id': productId,
+          'quantity': quantity,
+          'price': price,
+        });
+
+        // Update product stock
+        await db.rawUpdate('''
+          UPDATE products
+          SET stock = stock - ?
+          WHERE id = ?
+        ''', [quantity, productId]);
+      }
+
+      // Update totalOrden in orders table
+      await db.rawUpdate('''
+        UPDATE orders
+        SET totalOrden = ?
+        WHERE id = ?
+      ''', [totalOrden, orderId]);
+    }
+  }
+  
   Future<List<Map<String, dynamic>>> getProducts() async {
   final db = await database;
   return await db.rawQuery('''
@@ -306,4 +359,38 @@ class DatabaseHelper {
     }
     return ordersWithItems;
   }
+
+  Future<void> addProductStock(int productId, int quantity) async {
+    final db = await database;
+    await db.rawUpdate('''
+      UPDATE products
+      SET stock = stock + ?
+      WHERE id = ?
+    ''', [quantity, productId]);
+  }
+
+  Future<List<Map<String, dynamic>>> getProductsByRotation({required String period}) async {
+    final db = await database;
+    String dateCondition;
+    if (period == 'week') {
+      dateCondition = DateTime.now().subtract(Duration(days: 7)).toIso8601String();
+    } else if (period == 'month') {
+      dateCondition = DateTime.now().subtract(Duration(days: 30)).toIso8601String();
+    } else if (period == 'year') {
+      dateCondition = DateTime.now().subtract(Duration(days: 365)).toIso8601String();
+    } else {
+      throw ArgumentError('Invalid period: $period');
+    }
+
+    return await db.rawQuery('''
+      SELECT p.*, SUM(oi.quantity) as total_quantity
+      FROM products p
+      JOIN order_items oi ON p.id = oi.product_id
+      JOIN orders o ON oi.order_id = o.id
+      WHERE o.order_date >= ?
+      GROUP BY p.id
+      ORDER BY total_quantity DESC
+    ''', [dateCondition]);
+  }
+
 }

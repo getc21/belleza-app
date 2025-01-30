@@ -70,6 +70,41 @@ class ProductListPageState extends State<ProductListPage> {
     });
   }
 
+  void _showAddStockDialog(int productId) {
+    final _stockController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Añadir Stock'),
+          content: TextField(
+            controller: _stockController,
+            keyboardType: TextInputType.number,
+            decoration: InputDecoration(hintText: 'Cantidad de stock a añadir'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final int stockToAdd = int.parse(_stockController.text);
+                await dbHelper.addProductStock(productId, stockToAdd);
+                _loadProducts();
+                Navigator.of(context).pop();
+              },
+              child: Text('Añadir'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -170,6 +205,18 @@ class ProductListPageState extends State<ProductListPage> {
                               ),
                               Container(
                                 decoration: BoxDecoration(
+                                  color: Colors.orange,
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    _showAddStockDialog(product['id']);
+                                  },
+                                  icon: const Icon(Icons.add),
+                                  color: Colors.white, // Color del ícono
+                                ),
+                              ),
+                              Container(
+                                decoration: BoxDecoration(
                                   color: Colors.red,
                                 ),
                                 child: IconButton(
@@ -180,6 +227,7 @@ class ProductListPageState extends State<ProductListPage> {
                                   color: Colors.white, // Color del ícono
                                 ),
                               ),
+                              
                             ],
                           ),
                         ],
