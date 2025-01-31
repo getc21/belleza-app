@@ -54,7 +54,8 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                     fontSize: 16,
                   ),
                 ),
-                pw.Text('Total de Utilidad: \$${totalProfit.toStringAsFixed(2)}'),
+                pw.Text(
+                    'Total de Utilidad: \$${totalProfit.toStringAsFixed(2)}'),
                 pw.Text('Costo Total: \$${totalCost.toStringAsFixed(2)}'),
                 pw.SizedBox(height: 10),
                 pw.Text(
@@ -67,14 +68,22 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                 pw.Table.fromTextArray(
                   context: context,
                   data: <List<String>>[
-                    <String>['Producto', 'Precio de Compra', 'Precio de Venta', 'Cantidad Vendida', 'Utilidad'],
-                    ...products.map((product) => [
-                          product['name'].toString(),
-                          '\$${product['purchase_price'].toString()}',
-                          '\$${product['sale_price'].toString()}',
-                          product['quantity'].toString(),
-                          '\$${product['profit'].toString()}',
-                        ]).toList()
+                    <String>[
+                      'Producto',
+                      'Precio de Compra',
+                      'Precio de Venta',
+                      'Cantidad Vendida',
+                      'Utilidad'
+                    ],
+                    ...products
+                        .map((product) => [
+                              product['name'].toString(),
+                              '\$${product['purchase_price'].toString()}',
+                              '\$${product['sale_price'].toString()}',
+                              product['quantity'].toString(),
+                              '\$${product['profit'].toString()}',
+                            ])
+                        .toList()
                   ],
                 ),
               ],
@@ -130,51 +139,69 @@ class _SalesHistoryPageState extends State<SalesHistoryPage> {
                         Text(
                           'Mes: $month/$year',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Utils.defaultColor
-                          ),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Utils.defaultColor),
                         ),
-                        Utils.textLlaveValor('Costo Total: ', 'Bs. ${totalCost.toStringAsFixed(2)}'),
+                        Utils.textLlaveValor('Costo Total: ',
+                            'Bs. ${totalCost.toStringAsFixed(2)}'),
                         Utils.espacio20,
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                          Utils.bigTextLlaveValor('Total de Utilidad: ', 'Bs.${totalProfit.toStringAsFixed(2)}'),
-                        ]),
-                        
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Utils.bigTextLlaveValor('Total de Utilidad: ',
+                                  'Bs.${totalProfit.toStringAsFixed(2)}'),
+                            ]),
                         SizedBox(height: 10),
                         Text(
                           'Productos Vendidos:',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Utils.defaultColor
-                          ),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Utils.defaultColor),
                         ),
                         SingleChildScrollView(
                           scrollDirection: Axis.horizontal,
                           child: Container(
                             color: Colors.white,
                             child: DataTable(
+                              dataRowHeight: 30,
                               columnSpacing: 15,
                               horizontalMargin: 10,
                               headingRowHeight: 80,
                               columns: [
                                 DataColumn(label: Text('Producto')),
-                                DataColumn(label: Text('Precio\nde\nCompra', textAlign: TextAlign.center)),
-                                DataColumn(label: Text('Precio\nde\nVenta', textAlign: TextAlign.center)),
-                                DataColumn(label: Text('Cantidad\nVendida', textAlign: TextAlign.center)),
-                                DataColumn(label: Text('Utilidad', textAlign: TextAlign.center)),
+                                DataColumn(
+                                    label: Text('Precio\nde\nCompra',
+                                        textAlign: TextAlign.center)),
+                                DataColumn(
+                                    label: Text('Precio\nde\nVenta',
+                                        textAlign: TextAlign.center)),
+                                DataColumn(
+                                    label: Text('Cantidad\nVendida',
+                                        textAlign: TextAlign.center)),
+                                DataColumn(
+                                    label: Text('Utilidad',
+                                        textAlign: TextAlign.center)),
                               ],
                               rows: products.map<DataRow>((product) {
                                 return DataRow(
                                   cells: [
-                                    DataCell(Center(child: Text(product['name'].toString()))),
-                                    DataCell(Center(child: Text('\$${product['purchase_price'].toString()}'))),
-                                    DataCell(Center(child: Text('\$${product['sale_price'].toString()}'))),
-                                    DataCell(Center(child: Text(product['quantity'].toString()))),
-                                    DataCell(Center(child: Text('\$${product['profit'].toString()}'))),
+                                    DataCell(Center(
+                                        child:
+                                            Text(product['name'].toString()))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            product['purchase_price'].toString()))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            product['sale_price'].toString()))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            product['quantity'].toString()))),
+                                    DataCell(Center(
+                                        child: Text(
+                                            product['profit'].toString()))),
                                   ],
                                 );
                               }).toList(),

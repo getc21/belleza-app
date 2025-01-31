@@ -1,6 +1,7 @@
 import 'package:belleza_app/controllers/indexpage_controller.dart';
 import 'package:belleza_app/controllers/loading_controller.dart';
 import 'package:belleza_app/pages/category_list_page.dart';
+import 'package:belleza_app/pages/financial_report_page.dart';
 import 'package:belleza_app/pages/location_list_page.dart';
 import 'package:belleza_app/pages/order_list_page.dart';
 import 'package:belleza_app/pages/product_list_page.dart';
@@ -41,17 +42,16 @@ class _HomePageState extends State<HomePage> {
         final bool shouldPop = await showDialog(
               context: context,
               builder: (context) => AlertDialog(
+                backgroundColor: Utils.colorFondoCards,
                 title: Text('¿Desea salir de la aplicación?'),
                 content: Text('Presione Confirmar para salir'),
                 actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, false),
-                    child: Text('Cancelar'),
-                  ),
-                  TextButton(
-                    onPressed: () => Navigator.pop(context, true),
-                    child: Text('Confirmar'),
-                  ),
+                  Utils.elevatedButton('Cancelar', Utils.no, () {
+                    Navigator.pop(context, false);
+                  }),
+                  Utils.elevatedButton('Confirmar', Utils.yes, () {
+                    Navigator.pop(context, true);
+                  }),
                 ],
               ),
             ) ??
@@ -115,6 +115,14 @@ class _HomePageState extends State<HomePage> {
                     onTap: () {
                       Navigator.pop(context); // Cierra el drawer
                       Get.to(SalesHistoryPage());
+                    },
+                  ),
+                  ListTile(
+                    leading: Icon(Icons.monetization_on),
+                    title: Text('Reporte financiero'),
+                    onTap: () {
+                      Navigator.pop(context); // Cierra el drawer
+                      Get.to(FinancialReportPage());
                     },
                   ),
                 ],

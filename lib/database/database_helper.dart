@@ -82,6 +82,25 @@ class DatabaseHelper {
             FOREIGN KEY (product_id) REFERENCES products (id)
           )
         ''');
+        db.execute('''
+          CREATE TABLE order_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            order_id INTEGER NOT NULL,
+            product_id INTEGER NOT NULL,
+            quantity INTEGER NOT NULL,
+            price REAL NOT NULL,
+            FOREIGN KEY (order_id) REFERENCES orders (id),
+            FOREIGN KEY (product_id) REFERENCES products (id)
+          )
+        ''');
+        db.execute('''
+          CREATE TABLE financial_transactions (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          date TEXT,
+          type TEXT,
+          amount REAL
+        )
+        ''');
         await _insertTestData(db);
       },
     );
@@ -91,18 +110,19 @@ class DatabaseHelper {
   Future<void> _insertTestData(Database db) async {
     final aleatory = Random();
     final ahora = DateTime.now();
-
+    final seisMesesAtras = DateTime(ahora.year, ahora.month - 6, ahora.day);
     for (int i = 1; i <= 20; i++) {
       final expirityDate =
           ahora.add(Duration(days: aleatory.nextInt(60))).toIso8601String();
       final stockAleatorio =
           aleatory.nextInt(160); // Genera un número entre 1 y 20
-
+      final purchasePrice = (i * 2.0) + 5.0; // Precio de compra calculado
+    final salePrice = (i * 2.5) + 10.0; // Precio de venta calculado
       await db.insert('products', {
         'name': 'Product $i',
         'description': 'Description $i',
-        'purchase_price': (i * 2.0) + 5.0,
-        'sale_price': (i * 2.5) + 10.0,
+        'purchase_price': purchasePrice,
+        'sale_price': salePrice,
         'weight': '${i}kg',
         'category_id': (i % 3) + 1,
         'supplier_id': (i % 3) + 1,
@@ -111,6 +131,19 @@ class DatabaseHelper {
         'stock': stockAleatorio, // Asigna el stock aleatorio
         'expirity_date': expirityDate
       });
+      
+  final amount = purchasePrice * stockAleatorio;
+  // Calcular una fecha aleatoria entre la fecha actual y 6 meses atrás
+    final diferenciaDias = ahora.difference(seisMesesAtras).inDays;
+    final diasAleatorios = aleatory.nextInt(diferenciaDias);
+    final transactionDate = seisMesesAtras.add(Duration(days: diasAleatorios)).toIso8601String();
+
+  print('Inserting financial transaction - Type: Salida, Amount: $amount');
+  await db.insert('financial_transactions', {
+    'date': transactionDate,
+    'type': 'Salida',
+    'amount': amount,
+  });
     }
 
     // Insert categories
@@ -241,9 +274,20 @@ class DatabaseHelper {
   }
 
   Future<void> insertProduct(Map<String, dynamic> product) async {
-    final db = await database;
-    await db.insert('products', product);
-  }
+  final db = await database;
+  await db.insert('products', product);
+
+  // Registrar la salida de dinero
+  final purchasePrice = (product['purchase_price'] as double?) ?? 0.0;
+  final quantity = (product['quantity'] as int?) ?? 0;
+  final amount = purchasePrice * quantity;
+  print('Inserting financial transaction - Type: Salida, Amount: $amount');
+  await db.insert('financial_transactions', {
+    'date': DateTime.now().toIso8601String(),
+    'type': 'Salida',
+    'amount': amount,
+  });
+}
 
   Future<void> insertCategory(Map<String, dynamic> category) async {
     final db = await database;
@@ -381,15 +425,20 @@ class DatabaseHelper {
   ''', [supplierId]);
   }
 
-  Future<List<Map<String, dynamic>>> getProductsByLocation(
-      int locationId) async {
-    final db = await database;
-    return await db.query(
-      'products',
-      where: 'location_id = ?',
-      whereArgs: [locationId],
-    );
-  }
+  Future<List<Map<String, dynamic>>> getProductsByLocation(int locationId) async {
+  final db = await database;
+  return await db.rawQuery('''
+    SELECT p.*, 
+           c.name as category_name, 
+           s.name as supplier_name, 
+           l.name as location_name
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    LEFT JOIN suppliers s ON p.supplier_id = s.id
+    LEFT JOIN locations l ON p.location_id = l.id
+    WHERE p.location_id = ?
+  ''', [locationId]);
+}
 
   Future<Map<String, dynamic>?> getProductByName(String name) async {
     final db = await database;
@@ -422,14 +471,31 @@ class DatabaseHelper {
     return ordersWithItems;
   }
 
-  Future<void> addProductStock(int productId, int quantity) async {
-    final db = await database;
-    await db.rawUpdate('''
-      UPDATE products
-      SET stock = stock + ?
-      WHERE id = ?
-    ''', [quantity, productId]);
+  Future<void> addProductStock(int productId, int quantityToAdd) async {
+  final db = await database;
+  final product = await db.query('products', where: 'id = ?', whereArgs: [productId]);
+
+  if (product.isNotEmpty) {
+    final currentStock = (product.first['stock'] as int?) ?? 0;
+    final purchasePrice = (product.first['purchase_price'] as double?) ?? 0.0;
+    final newStock = currentStock + quantityToAdd;
+
+    await db.update(
+      'products',
+      {'stock': newStock},
+      where: 'id = ?',
+      whereArgs: [productId],
+    );
+
+    // Registrar la salida de dinero
+    final amount = purchasePrice * quantityToAdd;
+    await db.insert('financial_transactions', {
+      'date': DateTime.now().toIso8601String(),
+      'type': 'Salida',
+      'amount': amount,
+    });
   }
+}
 
   Future<List<Map<String, dynamic>>> getProductsByRotation(
       {required String period}) async {
@@ -512,4 +578,139 @@ class DatabaseHelper {
 
     return groupedData.values.toList();
   }
+
+  Future<List<Map<String, dynamic>>> getFinancialDataForLastYear() async {
+  final db = await database;
+  final now = DateTime.now();
+  final lastYear = DateTime(now.year - 1, now.month);
+
+  final incomeData = await db.rawQuery('''
+    SELECT 
+      strftime('%m', o.order_date) as month,
+      strftime('%Y', o.order_date) as year,
+      SUM(oi.quantity * p.sale_price) as totalIncome
+    FROM orders o
+    JOIN order_items oi ON o.id = oi.order_id
+    JOIN products p ON oi.product_id = p.id
+    WHERE o.order_date >= ?
+    GROUP BY month, year
+    ORDER BY year DESC, month DESC
+  ''', [lastYear.toIso8601String()]);
+
+  final expenseData = await db.rawQuery('''
+    SELECT 
+      strftime('%m', t.date) as month,
+      strftime('%Y', t.date) as year,
+      SUM(t.amount) as totalExpense
+    FROM financial_transactions t
+    WHERE t.type = 'Salida' AND t.date >= ?
+    GROUP BY month, year
+    ORDER BY year DESC, month DESC
+  ''', [lastYear.toIso8601String()]);
+
+  Map<String, Map<String, dynamic>> groupedData = {};
+
+  for (var row in incomeData) {
+    final month = row['month'];
+    final year = row['year'];
+    final key = '$year-$month';
+
+    if (!groupedData.containsKey(key)) {
+      groupedData[key] = {
+        'month': month,
+        'year': year,
+        'totalIncome': 0.0,
+        'totalExpense': 0.0,
+      };
+    }
+
+    groupedData[key]!['totalIncome'] += row['totalIncome'] ?? 0.0;
+  }
+
+  for (var row in expenseData) {
+    final month = row['month'];
+    final year = row['year'];
+    final key = '$year-$month';
+
+    if (!groupedData.containsKey(key)) {
+      groupedData[key] = {
+        'month': month,
+        'year': year,
+        'totalIncome': 0.0,
+        'totalExpense': 0.0,
+      };
+    }
+
+    groupedData[key]!['totalExpense'] += row['totalExpense'] ?? 0.0;
+  }
+
+  return groupedData.values.toList();
+}
+
+Future<List<Map<String, dynamic>>> getFinancialDataBetweenDates(DateTime startDate, DateTime endDate) async {
+  final db = await database;
+
+  final incomeData = await db.rawQuery('''
+    SELECT 
+      strftime('%m', o.order_date) as month,
+      strftime('%Y', o.order_date) as year,
+      SUM(oi.quantity * p.sale_price) as totalIncome
+    FROM orders o
+    JOIN order_items oi ON o.id = oi.order_id
+    JOIN products p ON oi.product_id = p.id
+    WHERE o.order_date BETWEEN ? AND ?
+    GROUP BY month, year
+    ORDER BY year DESC, month DESC
+  ''', [startDate.toIso8601String(), endDate.toIso8601String()]);
+
+  final expenseData = await db.rawQuery('''
+    SELECT 
+      strftime('%m', t.date) as month,
+      strftime('%Y', t.date) as year,
+      SUM(t.amount) as totalExpense
+    FROM financial_transactions t
+    WHERE t.type = 'Salida' AND t.date BETWEEN ? AND ?
+    GROUP BY month, year
+    ORDER BY year DESC, month DESC
+  ''', [startDate.toIso8601String(), endDate.toIso8601String()]);
+
+  Map<String, Map<String, dynamic>> groupedData = {};
+
+  for (var row in incomeData) {
+    final month = row['month'];
+    final year = row['year'];
+    final key = '$year-$month';
+
+    if (!groupedData.containsKey(key)) {
+      groupedData[key] = {
+        'month': month,
+        'year': year,
+        'totalIncome': 0.0,
+        'totalExpense': 0.0,
+      };
+    }
+
+    groupedData[key]!['totalIncome'] += row['totalIncome'] ?? 0.0;
+  }
+
+  for (var row in expenseData) {
+    final month = row['month'];
+    final year = row['year'];
+    final key = '$year-$month';
+
+    if (!groupedData.containsKey(key)) {
+      groupedData[key] = {
+        'month': month,
+        'year': year,
+        'totalIncome': 0.0,
+        'totalExpense': 0.0,
+      };
+    }
+
+    groupedData[key]!['totalExpense'] += row['totalExpense'] ?? 0.0;
+  }
+
+  return groupedData.values.toList();
+}
+
 }

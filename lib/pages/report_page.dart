@@ -103,6 +103,8 @@ class _ReportPageState extends State<ReportPage> {
                     child: Container(
                       color: Colors.white,
                       child: DataTable(
+                        headingRowHeight: 30,
+                        dataRowHeight: 30,
                         border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
                         columns: [
                           DataColumn(label: Text('ID')),
@@ -125,6 +127,8 @@ class _ReportPageState extends State<ReportPage> {
                     child: Container(
                       color: Colors.white,
                       child: DataTable(
+                        headingRowHeight: 30,
+                        dataRowHeight: 30,
                         border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
                         columns: [
                           DataColumn(label: Text('ID')),
@@ -147,6 +151,8 @@ class _ReportPageState extends State<ReportPage> {
                     child: Container(
                       color: Colors.white,
                       child: DataTable(
+                        headingRowHeight: 30,
+                        dataRowHeight: 30,
                         border: TableBorder(horizontalInside: BorderSide(color: Utils.defaultColor)),
                         columns: [
                           DataColumn(label: Text('ID')),

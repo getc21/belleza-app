@@ -1,4 +1,5 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
@@ -51,8 +52,11 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Agregar Proveedor'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,6 +67,8 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -77,6 +83,8 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               TextFormField(
                 controller: _contactNameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre de Contacto',
                 ),
@@ -91,6 +99,8 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               TextFormField(
                 controller: _contactEmailController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Email de Contacto',
                 ),
@@ -105,6 +115,8 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               TextFormField(
                 controller: _contactPhoneController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Teléfono de Contacto',
                 ),
@@ -119,6 +131,8 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               TextFormField(
                 controller: _addressController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Dirección',
                 ),
@@ -133,6 +147,7 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -141,22 +156,21 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                   children: [
                     Text(
                       'Cargar imagen',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera),
-                          label: Text('Cámara'),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Galería'),
-                        ),
+                        Utils.elevatedButtonWithIcon(
+                            'Cámara', Utils.colorBotones, () {
+                          _pickImage(ImageSource.camera);
+                        }, Icons.camera),
+                        Utils.elevatedButtonWithIcon(
+                            'Galería', Utils.colorBotones, () {
+                          _pickImage(ImageSource.gallery);
+                        }, Icons.photo_library),
                       ],
                     ),
                     if (_image != null) ...[
@@ -167,26 +181,23 @@ class _AddSupplierPageState extends State<AddSupplierPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
-                    final newSupplier = {
-                      'name': _nameController.text,
-                      'contact_name': _contactNameController.text,
-                      'contact_email': _contactEmailController.text,
-                      'contact_phone': _contactPhoneController.text,
-                      'address': _addressController.text,
-                      'foto': _fotoController.text,
-                    };
+              Utils.elevatedButton('Guardar', Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
+                  final newSupplier = {
+                    'name': _nameController.text,
+                    'contact_name': _contactNameController.text,
+                    'contact_email': _contactEmailController.text,
+                    'contact_phone': _contactPhoneController.text,
+                    'address': _addressController.text,
+                    'foto': _fotoController.text,
+                  };
 
-                    // Guardar en la base de datos local
-                    await DatabaseHelper().insertSupplier(newSupplier);
+                  // Guardar en la base de datos local
+                  await DatabaseHelper().insertSupplier(newSupplier);
 
-                    Get.to(HomePage()); // Cerrar la página
-                  }
-                },
-                child: Text('Guardar'),
-              ),
+                  Get.to(HomePage()); // Cerrar la página
+                }
+              }),
             ],
           ),
         ),

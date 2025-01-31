@@ -96,6 +96,24 @@ class _EditProductPageState extends State<EditProductPage> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
       locale: const Locale('es', 'ES'),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            dialogBackgroundColor: Utils.colorFondo,
+            primaryColor: Utils.colorBotones,
+            colorScheme: ColorScheme.light(
+                primary: Utils.colorBotones, secondary: Utils.colorGnav),
+            textTheme: TextTheme(
+              headlineMedium: TextStyle(color: Colors.black),
+              bodyMedium: TextStyle(color: Colors.black),
+            ),
+            buttonTheme: ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
 
     if (pickedDate != null && pickedDate != _selectedDate) {

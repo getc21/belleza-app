@@ -21,7 +21,6 @@ class _SupplierListPageState extends State<SupplierListPage> {
 
   final dbHelper = DatabaseHelper();
 
-
   @override
   void initState() {
     super.initState();
@@ -36,8 +35,15 @@ class _SupplierListPageState extends State<SupplierListPage> {
   }
 
   void _deleteSupplier(int id) async {
-    await dbHelper.deleteSupplier(id);
-    _loadSuppliers(); // Recargar la lista de proveedores después de eliminar
+    final confirmed = await Utils.showConfirmationDialog(
+      context,
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar este proveedor?',
+    );
+    if (confirmed) {
+      await dbHelper.deleteSupplier(id);
+      _loadSuppliers();
+    }
   }
 
   @override
@@ -73,7 +79,8 @@ class _SupplierListPageState extends State<SupplierListPage> {
               ),
               elevation: 4, // Sombra para el Card
               child: Padding(
-                padding: const EdgeInsets.only(left: 12.0), // Espaciado interno del Card
+                padding: const EdgeInsets.only(
+                    left: 12.0), // Espaciado interno del Card
                 child: Row(
                   children: [
                     // Imagen con bordes redondeados
@@ -140,40 +147,39 @@ class _SupplierListPageState extends State<SupplierListPage> {
                       ),
                     ),
                     Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.blue, // Color de fondo
-                                borderRadius: BorderRadius.only(
-                                    topRight:
-                                        Radius.circular(16)), // Bordes redondeados
-                              ), // Espaciado interno
-                              child: IconButton(
-                                onPressed: () {
-                                  Get.to(EditSupplierPage(supplier: supplier));
-                                },
-                                icon: const Icon(Icons.edit),
-                                color: Colors.white, // Color del ícono
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.only(
-                                    bottomRight:
-                                        Radius.circular(16)),
-                              ),
-                              child: IconButton(
-                                onPressed: () {
-                                  _deleteSupplier(supplier['id']);
-                                },
-                                icon: const Icon(Icons.delete),
-                                color: Colors.white, // Color del ícono
-                              ),
-                            ),
-                          ],
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Utils.edit, // Color de fondo
+                            borderRadius: BorderRadius.only(
+                                topRight:
+                                    Radius.circular(16)), // Bordes redondeados
+                          ), // Espaciado interno
+                          child: IconButton(
+                            onPressed: () {
+                              Get.to(EditSupplierPage(supplier: supplier));
+                            },
+                            icon: const Icon(Icons.edit),
+                            color: Colors.white, // Color del ícono
+                          ),
                         ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Utils.delete,
+                            borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(16)),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              _deleteSupplier(supplier['id']);
+                            },
+                            icon: const Icon(Icons.delete),
+                            color: Colors.white, // Color del ícono
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -186,7 +192,10 @@ class _SupplierListPageState extends State<SupplierListPage> {
         onPressed: () async {
           Get.to(AddSupplierPage());
         },
-        child: const Icon(Icons.add, color: Colors.white,),
+        child: const Icon(
+          Icons.add,
+          color: Colors.white,
+        ),
       ),
     );
   }

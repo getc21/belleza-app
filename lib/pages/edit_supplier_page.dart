@@ -1,4 +1,5 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
@@ -30,10 +31,14 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.supplier['name']);
-    _contactNameController = TextEditingController(text: widget.supplier['contact_name']);
-    _contactEmailController = TextEditingController(text: widget.supplier['contact_email']);
-    _contactPhoneController = TextEditingController(text: widget.supplier['contact_phone']);
-    _addressController = TextEditingController(text: widget.supplier['address']);
+    _contactNameController =
+        TextEditingController(text: widget.supplier['contact_name']);
+    _contactEmailController =
+        TextEditingController(text: widget.supplier['contact_email']);
+    _contactPhoneController =
+        TextEditingController(text: widget.supplier['contact_phone']);
+    _addressController =
+        TextEditingController(text: widget.supplier['address']);
     _fotoController = TextEditingController(text: widget.supplier['foto']);
   }
 
@@ -64,8 +69,11 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Editar Proveedor'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -76,6 +84,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -90,6 +100,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               TextFormField(
                 controller: _contactNameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre de Contacto',
                 ),
@@ -104,6 +116,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               TextFormField(
                 controller: _contactEmailController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Email de Contacto',
                 ),
@@ -118,6 +132,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               TextFormField(
                 controller: _contactPhoneController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Teléfono de Contacto',
                 ),
@@ -132,6 +148,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               TextFormField(
                 controller: _addressController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Dirección',
                 ),
@@ -146,6 +164,7 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -154,22 +173,21 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
                   children: [
                     Text(
                       'Cargar imagen',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera),
-                          label: Text('Cámara'),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Galería'),
-                        ),
+                        Utils.elevatedButtonWithIcon(
+                            'Cámara', Utils.colorBotones, () {
+                          _pickImage(ImageSource.camera);
+                        }, Icons.camera),
+                        Utils.elevatedButtonWithIcon(
+                            'Galería', Utils.colorBotones, () {
+                          _pickImage(ImageSource.gallery);
+                        }, Icons.photo_library),
                       ],
                     ),
                     if (_image != null) ...[
@@ -180,9 +198,8 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
                 ),
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+              Utils.elevatedButton('Actualizar', Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final updatedSupplier = {
                       'id': widget.supplier['id'],
                       'name': _nameController.text,
@@ -198,9 +215,7 @@ class _EditSupplierPageState extends State<EditSupplierPage> {
 
                     Get.to(HomePage()); // Cerrar la página
                   }
-                },
-                child: Text('Actualizar'),
-              ),
+              }),
             ],
           ),
         ),

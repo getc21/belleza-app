@@ -42,8 +42,15 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
   }
 
   void _deleteProduct(int id) async {
-    await dbHelper.deleteProduct(id);
-    _loadProducts();
+    final confirmed = await Utils.showConfirmationDialog(
+      context,
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar este producto?',
+    );
+    if (confirmed) {
+      await dbHelper.deleteProduct(id);
+      _loadProducts();
+    }
   }
 
   void _showAddStockDialog(int productId) {
@@ -172,7 +179,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                                   children: [
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.blue, // Color de fondo
+                                        color: Utils.edit, // Color de fondo
                                         borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(
                                                 5)), // Bordes redondeados
@@ -188,7 +195,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                                     ),
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.orange,
+                                        color: Utils.add,
                                       ),
                                       child: IconButton(
                                         onPressed: () {
@@ -200,7 +207,7 @@ class _CategoryProductsPageState extends State<CategoryProductsPage> {
                                     ),
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.red,
+                                        color: Utils.delete,
                                       ),
                                       child: IconButton(
                                         onPressed: () {

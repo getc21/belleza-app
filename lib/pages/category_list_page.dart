@@ -35,8 +35,15 @@ class _CategoryListPageState extends State<CategoryListPage> {
   }
 
   void _deleteCategory(int id) async {
-    await dbHelper.deleteCategory(id);
-    _loadCategories(); // Recargar la lista de categorías después de eliminar
+    final confirmed = await Utils.showConfirmationDialog(
+      context,
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar esta categoria?',
+    );
+    if(confirmed){
+      await dbHelper.deleteCategory(id);
+    _loadCategories();
+    }
   }
 
   @override
@@ -123,7 +130,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                           children: [
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.blue, // Color de fondo
+                                color: Utils.edit, // Color de fondo
                                 borderRadius: BorderRadius.only(
                                     topRight:
                                         Radius.circular(16)), // Bordes redondeados
@@ -138,7 +145,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                             ),
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.red,
+                                color: Utils.delete,
                                 borderRadius: BorderRadius.only(
                                     bottomRight:
                                         Radius.circular(16)),

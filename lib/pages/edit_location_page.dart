@@ -1,4 +1,5 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
@@ -27,8 +28,11 @@ class _EditLocationPageState extends State<EditLocationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Editar Ubicación'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -39,6 +43,8 @@ class _EditLocationPageState extends State<EditLocationPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -53,6 +59,8 @@ class _EditLocationPageState extends State<EditLocationPage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Descripción',
                 ),
@@ -64,9 +72,8 @@ class _EditLocationPageState extends State<EditLocationPage> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+              Utils.elevatedButton('Actualizar', Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final updatedLocation = {
                       'id': widget.location['id'],
                       'name': _nameController.text,
@@ -78,9 +85,7 @@ class _EditLocationPageState extends State<EditLocationPage> {
 
                     Get.to(HomePage()); // Cerrar la página
                   }
-                },
-                child: Text('Actualizar'),
-              ),
+              }),
             ],
           ),
         ),

@@ -1,10 +1,8 @@
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:convert';
-import 'dart:io';
 
 class AddLocationPage extends StatefulWidget {
   const AddLocationPage({super.key});
@@ -25,7 +23,10 @@ class _AddLocationPageState extends State<AddLocationPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Agregar Ubicación'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
+      backgroundColor: Utils.colorFondo,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -35,6 +36,8 @@ class _AddLocationPageState extends State<AddLocationPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -49,6 +52,8 @@ class _AddLocationPageState extends State<AddLocationPage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Descripción',
                 ),
@@ -60,9 +65,8 @@ class _AddLocationPageState extends State<AddLocationPage> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+              Utils.elevatedButton('Guardar', Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final newLocation = {
                       'name': _nameController.text,
                       'description': _descriptionController.text,
@@ -73,9 +77,7 @@ class _AddLocationPageState extends State<AddLocationPage> {
 
                     Get.to(HomePage()); // Cerrar la página
                   }
-                },
-                child: Text('Guardar'),
-              ),
+              }),
             ],
           ),
         ),

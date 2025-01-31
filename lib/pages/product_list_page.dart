@@ -46,11 +46,6 @@ class ProductListPageState extends State<ProductListPage> {
     });
   }
 
-  void _deleteProduct(int id) async {
-    await dbHelper.deleteProduct(id);
-    _loadProducts();
-  }
-
   void _filterProducts(String searchText) {
     setState(() {
       if (searchText.isNotEmpty) {
@@ -96,6 +91,18 @@ class ProductListPageState extends State<ProductListPage> {
         return stock < 10;
       }).toList();
     });
+  }
+
+  void _deleteProduct(int id) async {
+    final confirmed = await Utils.showConfirmationDialog(
+      context,
+      'Confirmar eliminación',
+      '¿Estás seguro de que deseas eliminar este producto?',
+    );
+    if (confirmed) {
+      await dbHelper.deleteProduct(id);
+      _loadProducts();
+    }
   }
 
   void _showAddStockDialog(int productId) {
@@ -236,7 +243,7 @@ class ProductListPageState extends State<ProductListPage> {
                                   children: [
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.blue, // Color de fondo
+                                        color: Utils.edit, // Color de fondo
                                         borderRadius: BorderRadius.only(
                                             topRight: Radius.circular(
                                                 5)), // Bordes redondeados
@@ -252,7 +259,7 @@ class ProductListPageState extends State<ProductListPage> {
                                     ),
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.orange,
+                                        color: Utils.add,
                                       ),
                                       child: IconButton(
                                         onPressed: () {
@@ -264,7 +271,7 @@ class ProductListPageState extends State<ProductListPage> {
                                     ),
                                     Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.red,
+                                        color: Utils.delete,
                                       ),
                                       child: IconButton(
                                         onPressed: () {

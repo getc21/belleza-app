@@ -11,6 +11,9 @@ class Utils {
   static const Color colorGnav = Color(0xFFF06292);
   static const Color yes = Color(0xFF66BB6A);
   static const Color no = Color(0xFFEF5350);
+  static const Color edit = Color(0xFF64B5F6);
+  static const Color add = Color(0xFFFFB74D);
+  static const Color delete = Color(0xFFE57373);
   // static Color? colorFondoClaro = Colors.grey[100];
   // static Color? primaryColor = const Color.fromRGBO(15, 16, 53, 1);
   // static Color? secondaryColor = const Color.fromRGBO(243, 184, 5, 1);
@@ -142,8 +145,8 @@ class Utils {
         ));
   }
 
-  static RichText bigTextLlaveValor(
-      String llave, String valor, {Color color = defaultColor}) {
+  static RichText bigTextLlaveValor(String llave, String valor,
+      {Color color = defaultColor}) {
     return RichText(
       text: TextSpan(
         children: [
@@ -161,4 +164,64 @@ class Utils {
     );
   }
 
+  static Future<bool> showConfirmationDialog(
+      BuildContext context, String title, String content) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              backgroundColor: colorFondoCards,
+              title: Text(
+                title,
+                style: TextStyle(color: defaultColor),
+              ),
+              content: Text(
+                content,
+                style: TextStyle(color: defaultColor),
+              ),
+              actions: <Widget>[
+                elevatedButton('Cancelar', no, () {
+                  Navigator.of(context).pop(false);
+                }),
+                elevatedButton('Eliminar', yes, () {
+                  Navigator.of(context).pop(true);
+                }),
+              ],
+            );
+          },
+        ) ??
+        false;
+  }
+
+  static Future<DateTime?> showCustomDatePicker(
+    BuildContext context, {
+    required DateTime initialDate,
+    required DateTime firstDate,
+    required DateTime lastDate,
+  }) async {
+    return await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            dialogBackgroundColor: Utils.colorFondo,
+            primaryColor: Utils.colorBotones,
+            colorScheme: ColorScheme.light(
+                primary: Utils.colorBotones, secondary: Utils.colorGnav),
+            textTheme: TextTheme(
+              headlineMedium: TextStyle(color: Colors.black),
+              bodyMedium: TextStyle(color: Colors.black),
+            ),
+            buttonTheme: ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+  }
 }

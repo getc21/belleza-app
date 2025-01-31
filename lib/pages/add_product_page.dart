@@ -8,6 +8,7 @@ import 'package:belleza_app/database/database_helper.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
+
 class AddProductPage extends StatefulWidget {
   const AddProductPage({super.key});
 
@@ -42,7 +43,25 @@ class _AddProductPageState extends State<AddProductPage> {
       initialDate: DateTime.now(), // Fecha inicial
       firstDate: DateTime(2000), // Fecha mínima
       lastDate: DateTime(2100), // Fecha máxima
-      locale: const Locale('es', 'ES'), // Idioma en español
+      locale: const Locale('es', 'ES'), 
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            dialogBackgroundColor: Utils.colorFondo,
+            primaryColor: Utils.colorBotones,
+            colorScheme: ColorScheme.light(
+                primary: Utils.colorBotones, secondary: Utils.colorGnav),
+            textTheme: TextTheme(
+              headlineMedium: TextStyle(color: Colors.black),
+              bodyMedium: TextStyle(color: Colors.black),
+            ),
+            buttonTheme: ButtonThemeData(
+              textTheme: ButtonTextTheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },// Idioma en español
     );
 
     if (pickedDate != null && pickedDate != _selectedDate) {
@@ -111,7 +130,10 @@ class _AddProductPageState extends State<AddProductPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Agregar Producto'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
+      backgroundColor: Utils.colorFondo,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -121,6 +143,8 @@ class _AddProductPageState extends State<AddProductPage> {
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
                   border: OutlineInputBorder(),
                   labelText: 'Nombre',
                 ),
@@ -135,7 +159,10 @@ class _AddProductPageState extends State<AddProductPage> {
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Descripción'),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                    labelText: 'Descripción'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Por favor ingrese la descripción';
@@ -147,6 +174,7 @@ class _AddProductPageState extends State<AddProductPage> {
               Container(
                 padding: EdgeInsets.all(10),
                 decoration: BoxDecoration(
+                  color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -162,16 +190,14 @@ class _AddProductPageState extends State<AddProductPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.camera),
-                          icon: Icon(Icons.camera),
-                          label: Text('Cámara'),
-                        ),
-                        ElevatedButton.icon(
-                          onPressed: () => _pickImage(ImageSource.gallery),
-                          icon: Icon(Icons.photo_library),
-                          label: Text('Galería'),
-                        ),
+                        Utils.elevatedButtonWithIcon(
+                            'Cámara', Utils.colorBotones, () {
+                          _pickImage(ImageSource.camera);
+                        }, Icons.camera),
+                        Utils.elevatedButtonWithIcon(
+                            'Galería', Utils.colorBotones, () {
+                          _pickImage(ImageSource.gallery);
+                        }, Icons.photo_library),
                       ],
                     ),
                     if (_image != null) ...[
@@ -188,6 +214,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     child: TextFormField(
                       controller: _weightController,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         labelText: 'Tamaño',
                       ),
@@ -205,6 +233,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     child: TextFormField(
                       controller: _stockQuantityController,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         labelText: 'Stock',
                       ),
@@ -226,6 +256,8 @@ class _AddProductPageState extends State<AddProductPage> {
                     child: TextFormField(
                       controller: _priceCompraController,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         labelText: 'Precio de compra',
                       ),
@@ -238,12 +270,13 @@ class _AddProductPageState extends State<AddProductPage> {
                       },
                     ),
                   ),
-                  
                   SizedBox(width: 10),
                   Expanded(
                     child: TextFormField(
                       controller: _priceVentaController,
                       decoration: InputDecoration(
+                        filled: true,
+                        fillColor: Colors.white,
                         border: OutlineInputBorder(),
                         labelText: 'Precio de venta',
                       ),
@@ -262,7 +295,10 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedCategoryId,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Categoría'),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                    labelText: 'Categoría'),
                 items: _categories.map((category) {
                   return DropdownMenuItem<int>(
                     value: category['id'],
@@ -285,7 +321,10 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedSupplierId,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Proveedor'),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                    labelText: 'Proveedor'),
                 items: _suppliers.map((supplier) {
                   return DropdownMenuItem<int>(
                     value: supplier['id'],
@@ -308,7 +347,10 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedLocationId,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), labelText: 'Ubicación'),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(),
+                    labelText: 'Ubicación'),
                 items: _locations.map((location) {
                   return DropdownMenuItem<int>(
                     value: location['id'],
@@ -331,6 +373,8 @@ class _AddProductPageState extends State<AddProductPage> {
               TextFormField(
                 controller: _expirityDateController,
                 decoration: InputDecoration(
+                    filled: true,
+                    fillColor: Colors.white,
                     border: OutlineInputBorder(),
                     labelText: 'Fecha de vencimiento'),
                 keyboardType: TextInputType.datetime,
@@ -345,13 +389,13 @@ class _AddProductPageState extends State<AddProductPage> {
                 },
               ),
               SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  if (formKey.currentState?.validate() ?? false) {
+              Utils.elevatedButton('Guardar',Utils.colorBotones, () async {
+                if (formKey.currentState?.validate() ?? false) {
                     final newProduct = {
                       'name': _nameController.text,
                       'description': _descriptionController.text,
-                      'purchase_price': double.parse(_priceCompraController.text),
+                      'purchase_price':
+                          double.parse(_priceCompraController.text),
                       'sale_price': double.parse(_priceVentaController.text),
                       'weight': _weightController.text,
                       'category_id': _selectedCategoryId,
@@ -367,9 +411,7 @@ class _AddProductPageState extends State<AddProductPage> {
 
                     Get.to(HomePage()); // Cerrar el diálogo
                   }
-                },
-                child: Text('Guardar'),
-              ),
+              }),
             ],
           ),
         ),

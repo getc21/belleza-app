@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:belleza_app/controllers/indexpage_controller.dart';
 import 'package:belleza_app/pages/home_page.dart';
+import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner_plus/qr_code_scanner_plus.dart';
 import 'package:belleza_app/database/database_helper.dart';
@@ -66,6 +67,17 @@ class _AddOrderPageState extends State<AddOrderPage> {
   }
 
   void _registerOrder() async {
+    if (_products.isEmpty) {
+      // Mostrar un mensaje de advertencia si no hay productos en la lista
+      Get.snackbar(
+        'Advertencia',
+        'No se puede registrar una orden sin productos.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+      return;
+    }
+
     final newOrder = {
       'products': _products,
       'date': DateTime.now().toString(),
@@ -84,8 +96,11 @@ class _AddOrderPageState extends State<AddOrderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Utils.colorFondo,
       appBar: AppBar(
         title: Text('Agregar Orden'),
+        backgroundColor: Utils.colorGnav,
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [
@@ -98,35 +113,58 @@ class _AddOrderPageState extends State<AddOrderPage> {
           ),
           Expanded(
             flex: 2,
-            child: ListView.builder(
-              itemCount: _products.length,
-              itemBuilder: (context, index) {
-                final product = _products[index];
-                return ListTile(
-                  title: Text(product['name']),
-                  subtitle: Text('Cantidad: ${product['quantity']}'),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.remove),
-                        onPressed: () => _decrementQuantity(index),
+            child: Padding(
+              padding: EdgeInsets.all(10),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: ListView.builder(
+                  itemCount: _products.length,
+                  itemBuilder: (context, index) {
+                    final product = _products[index];
+                    return ListTile(
+                      title: Text(product['name']),
+                      subtitle: Text('Cantidad: ${product['quantity']}'),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () => _decrementQuantity(index),
+                            style: ElevatedButton.styleFrom(
+                              shape: CircleBorder(), // Hace el botón redondo
+                              backgroundColor: Utils.colorBotones,// Fondo rojo
+                              padding: EdgeInsets.all(
+                                  10), // Ajusta el tamaño del botón
+                            ),
+                            child: Icon(Icons.remove,
+                                color: Colors.white), // Ícono blanco
+                          ),
+                          Text('${product['quantity']}', style: TextStyle(fontSize: 14)),
+                          ElevatedButton(
+                            onPressed: () => _incrementQuantity(index),
+                            style: ElevatedButton.styleFrom(
+                              shape: CircleBorder(), // Hace el botón redondo
+                              backgroundColor: Utils.colorBotones, // Fondo rojo
+                              padding: EdgeInsets.all(
+                                  10), // Ajusta el tamaño del botón
+                            ),
+                            child: Icon(Icons.add,
+                                color: Colors.white), // Ícono blanco
+                          ),
+                        ],
                       ),
-                      Text('${product['quantity']}'),
-                      IconButton(
-                        icon: Icon(Icons.add),
-                        onPressed: () => _incrementQuantity(index),
-                      ),
-                    ],
-                  ),
-                );
-              },
+                    );
+                  },
+                ),
+              ),
             ),
           ),
-          ElevatedButton(
-            onPressed: _registerOrder,
-            child: Text('Registrar Orden'),
-          ),
+          Utils.elevatedButton('Registrar Orden', Utils.colorBotones, () {
+            _registerOrder();
+          }),
+          Utils.espacio20
         ],
       ),
     );
