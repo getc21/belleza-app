@@ -105,14 +105,14 @@ class _AddOrderPageState extends State<AddOrderPage> {
       body: Column(
         children: [
           Expanded(
-            flex: 1,
+            flex: 4,
             child: QRView(
               key: qrKey,
               onQRViewCreated: _onQRViewCreated,
             ),
           ),
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Padding(
               padding: EdgeInsets.all(10),
               child: Container(

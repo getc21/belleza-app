@@ -1,3 +1,4 @@
+import 'package:belleza_app/pages/financial_chart_group_data.dart';
 import 'package:flutter/material.dart';
 import 'package:belleza_app/database/database_helper.dart';
 import 'package:belleza_app/utils/utils.dart';
@@ -134,11 +135,7 @@ class _FinancialReportPageState extends State<FinancialReportPage> {
                                   colorScheme: ColorScheme.light(
                                       primary: Utils.colorBotones,
                                       secondary: Utils.colorGnav),
-                                  textTheme: TextTheme(
-                                    headlineMedium:
-                                        TextStyle(color: Colors.black),
-                                    bodyMedium: TextStyle(color: Colors.black),
-                                  ),
+                                  
                                   buttonTheme: ButtonThemeData(
                                     textTheme: ButtonTextTheme.primary,
                                   ),
@@ -231,6 +228,15 @@ class _FinancialReportPageState extends State<FinancialReportPage> {
     );
   }
 
+  void _navigateToChartPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => FinancialChartPage(financialData: _financialData),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -252,33 +258,39 @@ class _FinancialReportPageState extends State<FinancialReportPage> {
               scrollDirection: Axis.horizontal,
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: Container(
-                  decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20)),
-                  child: DataTable(
-                    columnSpacing: 20,
-                    headingRowHeight: 30,
-                    dataRowHeight: 30,
-                    columns: [
-                      DataColumn(label: Text('Mes')),
-                      DataColumn(label: Text('Año')),
-                      DataColumn(label: Text('Entradas')),
-                      DataColumn(label: Text('Salidas')),
-                      DataColumn(label: Text('Balance')),
-                    ],
-                    rows: _financialData.map((data) {
-                      return DataRow(cells: [
-                        DataCell(Text(data['month'])),
-                        DataCell(Text(data['year'])),
-                        DataCell(Text(data['totalIncome'].toString())),
-                        DataCell(Text(data['totalExpense'].toString())),
-                        DataCell(Text(
-                            (data['totalIncome'] - data['totalExpense'])
-                                .toString())),
-                      ]);
-                    }).toList(),
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: DataTable(
+                        columnSpacing: 20,
+                        headingRowHeight: 30,
+                        dataRowHeight: 30,
+                        columns: [
+                          DataColumn(label: Text('Mes')),
+                          DataColumn(label: Text('Año')),
+                          DataColumn(label: Text('Entradas')),
+                          DataColumn(label: Text('Salidas')),
+                          DataColumn(label: Text('Balance')),
+                        ],
+                        rows: _financialData.map((data) {
+                          return DataRow(cells: [
+                            DataCell(Text(data['month'])),
+                            DataCell(Text(data['year'])),
+                            DataCell(Text(data['totalIncome'].toString())),
+                            DataCell(Text(data['totalExpense'].toString())),
+                            DataCell(Text(
+                                (data['totalIncome'] - data['totalExpense'])
+                                    .toString())),
+                          ]);
+                        }).toList(),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Utils.elevatedButton('Ver Gráfico', Utils.colorBotones, _navigateToChartPage),
+                  ],
                 ),
               ),
             ),

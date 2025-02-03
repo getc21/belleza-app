@@ -166,7 +166,14 @@ class _EditProductPageState extends State<EditProductPage> {
             children: [
               TextFormField(
                 controller: _nameController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                  prefixIconColor: Utils.colorBotones,
+                  floatingLabelStyle: TextStyle(
+                      color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.colorBotones, width: 3),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(),
@@ -182,7 +189,13 @@ class _EditProductPageState extends State<EditProductPage> {
               Utils.espacio10,
               TextFormField(
                 controller: _descriptionController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                  floatingLabelStyle: TextStyle(
+                      color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.colorBotones, width: 3),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(),
@@ -238,7 +251,15 @@ class _EditProductPageState extends State<EditProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _priceCompraController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -257,7 +278,15 @@ class _EditProductPageState extends State<EditProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _priceVentaController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -279,7 +308,15 @@ class _EditProductPageState extends State<EditProductPage> {
                 Expanded(
                   child: TextFormField(
                     controller: _weightController,
+                    cursorColor: Utils.colorBotones,
                     decoration: InputDecoration(
+                      floatingLabelStyle: TextStyle(
+                          color: Utils.colorBotones,
+                          fontWeight: FontWeight.bold),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Utils.colorBotones, width: 3),
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(),
@@ -298,7 +335,15 @@ class _EditProductPageState extends State<EditProductPage> {
                 Expanded(
                   child: TextFormField(
                     controller: _stockQuantityController,
+                    cursorColor: Utils.colorBotones,
                     decoration: InputDecoration(
+                      floatingLabelStyle: TextStyle(
+                          color: Utils.colorBotones,
+                          fontWeight: FontWeight.bold),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: Utils.colorBotones, width: 3),
+                      ),
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(),
@@ -318,6 +363,12 @@ class _EditProductPageState extends State<EditProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedCategoryId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -344,6 +395,12 @@ class _EditProductPageState extends State<EditProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedSupplierId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -370,6 +427,12 @@ class _EditProductPageState extends State<EditProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedLocationId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -395,7 +458,15 @@ class _EditProductPageState extends State<EditProductPage> {
               Utils.espacio10,
               TextFormField(
                 controller: _expirityDateController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                    prefixIconColor: Utils.colorBotones,
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -414,27 +485,26 @@ class _EditProductPageState extends State<EditProductPage> {
               SizedBox(height: 20),
               Utils.elevatedButton('Guardar', Utils.colorBotones, () async {
                 if (formKey.currentState?.validate() ?? false) {
-                    final updatedProduct = {
-                      'id': widget.product['id'],
-                      'name': _nameController.text,
-                      'description': _descriptionController.text,
-                      'purchase_price':
-                          double.parse(_priceCompraController.text),
-                      'sale_price': double.parse(_priceVentaController.text),
-                      'weight': _weightController.text,
-                      'category_id': _selectedCategoryId,
-                      'supplier_id': _selectedSupplierId,
-                      'location_id': _selectedLocationId,
-                      'stock': int.parse(_stockQuantityController.text),
-                      'expirity_date': _expirityDateController.text,
-                      'foto': _fotoController.text,
-                    };
+                  final updatedProduct = {
+                    'id': widget.product['id'],
+                    'name': _nameController.text,
+                    'description': _descriptionController.text,
+                    'purchase_price': double.parse(_priceCompraController.text),
+                    'sale_price': double.parse(_priceVentaController.text),
+                    'weight': _weightController.text,
+                    'category_id': _selectedCategoryId,
+                    'supplier_id': _selectedSupplierId,
+                    'location_id': _selectedLocationId,
+                    'stock': int.parse(_stockQuantityController.text),
+                    'expirity_date': _expirityDateController.text,
+                    'foto': _fotoController.text,
+                  };
 
-                    // Actualizar en la base de datos local
-                    await DatabaseHelper().updateProduct(updatedProduct);
+                  // Actualizar en la base de datos local
+                  await DatabaseHelper().updateProduct(updatedProduct);
 
-                    Get.to(HomePage()); // Cerrar el diálogo
-                  }
+                  Get.to(HomePage()); // Cerrar el diálogo
+                }
               }),
             ],
           ),

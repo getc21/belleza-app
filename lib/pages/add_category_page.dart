@@ -62,7 +62,14 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
             children: [
               TextFormField(
                 controller: _nameController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                  prefixIconColor: Utils.colorBotones,
+                  floatingLabelStyle: TextStyle(
+                      color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.colorBotones, width: 3),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(),
@@ -78,7 +85,14 @@ class _AddCategoryPageState extends State<AddCategoryPage> {
               SizedBox(height: 10),
               TextFormField(
                 controller: _descriptionController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                  prefixIconColor: Utils.colorBotones,
+                  floatingLabelStyle: TextStyle(
+                      color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.colorBotones, width: 3),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(),

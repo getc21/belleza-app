@@ -43,7 +43,7 @@ class _AddProductPageState extends State<AddProductPage> {
       initialDate: DateTime.now(), // Fecha inicial
       firstDate: DateTime(2000), // Fecha mínima
       lastDate: DateTime(2100), // Fecha máxima
-      locale: const Locale('es', 'ES'), 
+      locale: const Locale('es', 'ES'),
       builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.light().copyWith(
@@ -61,7 +61,7 @@ class _AddProductPageState extends State<AddProductPage> {
           ),
           child: child!,
         );
-      },// Idioma en español
+      }, // Idioma en español
     );
 
     if (pickedDate != null && pickedDate != _selectedDate) {
@@ -142,7 +142,13 @@ class _AddProductPageState extends State<AddProductPage> {
             children: [
               TextFormField(
                 controller: _nameController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                  floatingLabelStyle: TextStyle(
+                      color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.colorBotones, width: 3),
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(),
@@ -158,7 +164,14 @@ class _AddProductPageState extends State<AddProductPage> {
               Utils.espacio10,
               TextFormField(
                 controller: _descriptionController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -213,7 +226,15 @@ class _AddProductPageState extends State<AddProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _weightController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -232,7 +253,15 @@ class _AddProductPageState extends State<AddProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _stockQuantityController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -255,7 +284,15 @@ class _AddProductPageState extends State<AddProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _priceCompraController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -274,7 +311,15 @@ class _AddProductPageState extends State<AddProductPage> {
                   Expanded(
                     child: TextFormField(
                       controller: _priceVentaController,
+                      cursorColor: Utils.colorBotones,
                       decoration: InputDecoration(
+                        floatingLabelStyle: TextStyle(
+                            color: Utils.colorBotones,
+                            fontWeight: FontWeight.bold),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide:
+                              BorderSide(color: Utils.colorBotones, width: 3),
+                        ),
                         filled: true,
                         fillColor: Colors.white,
                         border: OutlineInputBorder(),
@@ -295,6 +340,12 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedCategoryId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -321,6 +372,12 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedSupplierId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -347,6 +404,12 @@ class _AddProductPageState extends State<AddProductPage> {
               DropdownButtonFormField<int>(
                 value: _selectedLocationId,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -372,7 +435,14 @@ class _AddProductPageState extends State<AddProductPage> {
               Utils.espacio10,
               TextFormField(
                 controller: _expirityDateController,
+                cursorColor: Utils.colorBotones,
                 decoration: InputDecoration(
+                    floatingLabelStyle: TextStyle(
+                        color: Utils.colorBotones, fontWeight: FontWeight.bold),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: Utils.colorBotones, width: 3),
+                    ),
                     filled: true,
                     fillColor: Colors.white,
                     border: OutlineInputBorder(),
@@ -389,28 +459,27 @@ class _AddProductPageState extends State<AddProductPage> {
                 },
               ),
               SizedBox(height: 20),
-              Utils.elevatedButton('Guardar',Utils.colorBotones, () async {
+              Utils.elevatedButton('Guardar', Utils.colorBotones, () async {
                 if (formKey.currentState?.validate() ?? false) {
-                    final newProduct = {
-                      'name': _nameController.text,
-                      'description': _descriptionController.text,
-                      'purchase_price':
-                          double.parse(_priceCompraController.text),
-                      'sale_price': double.parse(_priceVentaController.text),
-                      'weight': _weightController.text,
-                      'category_id': _selectedCategoryId,
-                      'supplier_id': _selectedSupplierId,
-                      'stock': int.parse(_stockQuantityController.text),
-                      'location_id': _selectedLocationId,
-                      'expirity_date': _expirityDateController.text,
-                      'foto': _fotoController.text,
-                    };
+                  final newProduct = {
+                    'name': _nameController.text,
+                    'description': _descriptionController.text,
+                    'purchase_price': double.parse(_priceCompraController.text),
+                    'sale_price': double.parse(_priceVentaController.text),
+                    'weight': _weightController.text,
+                    'category_id': _selectedCategoryId,
+                    'supplier_id': _selectedSupplierId,
+                    'stock': int.parse(_stockQuantityController.text),
+                    'location_id': _selectedLocationId,
+                    'expirity_date': _expirityDateController.text,
+                    'foto': _fotoController.text,
+                  };
 
-                    // Guardar en la base de datos local
-                    await DatabaseHelper().insertProduct(newProduct);
+                  // Guardar en la base de datos local
+                  await DatabaseHelper().insertProduct(newProduct);
 
-                    Get.to(HomePage()); // Cerrar el diálogo
-                  }
+                  Get.to(HomePage()); // Cerrar el diálogo
+                }
               }),
             ],
           ),
