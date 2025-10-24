@@ -206,233 +206,235 @@ class ProductListPageState extends State<ProductListPage> {
               Expanded(
                 child: Stack(
                   children: [
-                    SingleChildScrollView(
-                      padding: const EdgeInsets.all(8),
-                      child: Wrap(
-                        spacing: 8, // Espaciado horizontal entre elementos
-                        runSpacing: 8, // Espaciado vertical entre filas
-                        children: _filteredProducts.map((product) {
-                          final stock = product['stock'] ?? 0;
-                          final expiryDate =
-                              DateTime.tryParse(product['expirity_date'] ?? '');
-                          final isLowStock = stock < 10;
-                          final isNearExpiry = expiryDate != null &&
-                              expiryDate.difference(DateTime.now()).inDays <=
-                                  30;
-                          final weight = product['weight'] ?? '';
-                          final locationName =
-                              product['location_name'] ?? 'Sin ubicación';
-                          final purchasePrice =
-                              formatNumber(product['purchase_price']);
-                          final salePrice = formatNumber(product['sale_price']);
-                          final fotoBase64 = product['foto'] ?? '';
-
-                          Uint8List? imageBytes;
-                          if (fotoBase64.isNotEmpty) {
-                            try {
-                              imageBytes = base64Decode(fotoBase64);
-                            } catch (e) {
-                              imageBytes =
-                                  null; // Si ocurre un error, asigna null
+                    Center(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(8),
+                        child: Wrap(
+                          spacing: 8, // Espaciado horizontal entre elementos
+                          runSpacing: 8, // Espaciado vertical entre filas
+                          children: _filteredProducts.map((product) {
+                            final stock = product['stock'] ?? 0;
+                            final expiryDate =
+                                DateTime.tryParse(product['expirity_date'] ?? '');
+                            final isLowStock = stock < 10;
+                            final isNearExpiry = expiryDate != null &&
+                                expiryDate.difference(DateTime.now()).inDays <=
+                                    30;
+                            final weight = product['weight'] ?? '';
+                            final locationName =
+                                product['location_name'] ?? 'Sin ubicación';
+                            final purchasePrice =
+                                formatNumber(product['purchase_price']);
+                            final salePrice = formatNumber(product['sale_price']);
+                            final fotoBase64 = product['foto'] ?? '';
+                      
+                            Uint8List? imageBytes;
+                            if (fotoBase64.isNotEmpty) {
+                              try {
+                                imageBytes = base64Decode(fotoBase64);
+                              } catch (e) {
+                                imageBytes =
+                                    null; // Si ocurre un error, asigna null
+                              }
                             }
-                          }
-                          return Container(
-                            width: MediaQuery.of(context).size.width *
-                                0.45, // Ajusta el ancho
-                            decoration: BoxDecoration(
-                              color: Utils.colorFondoCards,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.grey.shade300),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Imagen con iconos
-                                Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                          top: Radius.circular(8),
+                            return Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.45, // Ajusta el ancho
+                              decoration: BoxDecoration(
+                                color: Utils.colorFondoCards,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey.shade300),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    blurRadius: 4,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Imagen con iconos
+                                  Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade200,
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                            top: Radius.circular(8),
+                                          ),
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              const BorderRadius.vertical(
+                                            top: Radius.circular(8),
+                                          ),
+                                          child: imageBytes != null
+                                              ? Image.memory(
+                                                  imageBytes,
+                                                  height: 132,
+                                                  width: double.infinity,
+                                                  fit: BoxFit.fill,
+                                                )
+                                              : Image.asset(
+                                                  'assets/img/perfume.webp',
+                                                  fit: BoxFit.fill,
+                                                  height: 130,
+                                                  width: double.infinity,
+                                                ),
                                         ),
                                       ),
-                                      child: ClipRRect(
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                          top: Radius.circular(8),
-                                        ),
-                                        child: imageBytes != null
-                                            ? Image.memory(
-                                                imageBytes,
-                                                height: 132,
-                                                width: double.infinity,
-                                                fit: BoxFit.fill,
-                                              )
-                                            : Image.asset(
-                                                'assets/img/perfume.webp',
-                                                fit: BoxFit.fill,
-                                                height: 130,
-                                                width: double.infinity,
-                                              ),
+                                      Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Utils.edit, // Color de fondo
+                                              borderRadius: BorderRadius.only(
+                                                  topRight: Radius.circular(
+                                                      5)), // Bordes redondeados
+                                            ), // Espaciado interno
+                                            child: IconButton(
+                                              onPressed: () {
+                                                Get.to(EditProductPage(
+                                                    product: product));
+                                              },
+                                              icon: const Icon(Icons.edit),
+                                              color:
+                                                  Colors.white, // Color del ícono
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Utils.add,
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                _showAddStockDialog(
+                                                    product['id']);
+                                              },
+                                              icon: const Icon(Icons.add),
+                                              color:
+                                                  Colors.white, // Color del ícono
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              color: Utils.delete,
+                                            ),
+                                            child: IconButton(
+                                              onPressed: () {
+                                                _deleteProduct(product['id']);
+                                              },
+                                              icon: const Icon(Icons.delete),
+                                              color:
+                                                  Colors.white, // Color del ícono
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Utils.edit, // Color de fondo
-                                            borderRadius: BorderRadius.only(
-                                                topRight: Radius.circular(
-                                                    5)), // Bordes redondeados
-                                          ), // Espaciado interno
-                                          child: IconButton(
-                                            onPressed: () {
-                                              Get.to(EditProductPage(
-                                                  product: product));
-                                            },
-                                            icon: const Icon(Icons.edit),
-                                            color:
-                                                Colors.white, // Color del ícono
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Utils.add,
-                                          ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              _showAddStockDialog(
-                                                  product['id']);
-                                            },
-                                            icon: const Icon(Icons.add),
-                                            color:
-                                                Colors.white, // Color del ícono
-                                          ),
-                                        ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                            color: Utils.delete,
-                                          ),
-                                          child: IconButton(
-                                            onPressed: () {
-                                              _deleteProduct(product['id']);
-                                            },
-                                            icon: const Icon(Icons.delete),
-                                            color:
-                                                Colors.white, // Color del ícono
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 8),
-                                        child: Utils.textTitle(
-                                            product['name'] ?? 'Producto'),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.all(8),
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          _generateAndShowPdf(
-                                              context, product['name']);
-                                        },
-                                        child: BarcodeWidget(
-                                          backgroundColor: Colors.white,
-                                          barcode: Barcode.qrCode(),
-                                          data: product['name'] ?? '',
-                                          width: 40,
-                                          height: 40,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Utils.textDescription(
-                                      product['description'] ?? 'Descripción'),
-                                ),
-                                const SizedBox(height: 4),
-                                // Fecha de vencimiento y QR
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    ],
+                                  ),
+                                  Row(
                                     children: [
                                       Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            Utils.textLlaveValor(
-                                              'Fecha de caducidad: ',
-                                              expiryDate != null
-                                                  ? expiryDate
-                                                      .toLocal()
-                                                      .toString()
-                                                      .split(' ')[0]
-                                                  : 'Sin fecha',
-                                              color: isNearExpiry
-                                                  ? Colors.orange
-                                                  : Utils.defaultColor,
-                                            ),
-                                            Utils.textLlaveValor(
-                                                'Stock: ',
-                                                stock != null
-                                                    ? '$stock'
-                                                    : 'Sin stock',
-                                                color: isLowStock
-                                                    ? Colors.red
-                                                    : Utils.defaultColor),
-                                            Utils.textLlaveValor(
-                                              'Tamaño: ',
-                                              weight.isNotEmpty
-                                                  ? weight
-                                                  : 'Sin tamaño',
-                                            ),
-                                            Utils.textLlaveValor(
-                                                'Ubicacion: ', locationName),
-                                            Utils.textLlaveValor(
-                                              'Precio de compra: ',
-                                              '${purchasePrice.toString()} Bs.',
-                                            ),
-                                            Utils.bigTextLlaveValor(
-                                              'Precio de venta: ',
-                                              '\n${salePrice.toString()} Bs.',
-                                            ),
-                                            Utils.espacio10
-                                          ],
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8),
+                                          child: Utils.textTitle(
+                                              product['name'] ?? 'Producto'),
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: EdgeInsets.all(8),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _generateAndShowPdf(
+                                                context, product['name']);
+                                          },
+                                          child: BarcodeWidget(
+                                            backgroundColor: Colors.white,
+                                            barcode: Barcode.qrCode(),
+                                            data: product['name'] ?? '',
+                                            width: 40,
+                                            height: 40,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
+                      
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 8),
+                                    child: Utils.textDescription(
+                                        product['description'] ?? 'Descripción'),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  // Fecha de vencimiento y QR
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.stretch,
+                                            children: [
+                                              Utils.textLlaveValor(
+                                                'Fecha de caducidad: ',
+                                                expiryDate != null
+                                                    ? expiryDate
+                                                        .toLocal()
+                                                        .toString()
+                                                        .split(' ')[0]
+                                                    : 'Sin fecha',
+                                                color: isNearExpiry
+                                                    ? Colors.orange
+                                                    : Utils.defaultColor,
+                                              ),
+                                              Utils.textLlaveValor(
+                                                  'Stock: ',
+                                                  stock != null
+                                                      ? '$stock'
+                                                      : 'Sin stock',
+                                                  color: isLowStock
+                                                      ? Colors.red
+                                                      : Utils.defaultColor),
+                                              Utils.textLlaveValor(
+                                                'Tamaño: ',
+                                                weight.isNotEmpty
+                                                    ? weight
+                                                    : 'Sin tamaño',
+                                              ),
+                                              Utils.textLlaveValor(
+                                                  'Ubicacion: ', locationName),
+                                              Utils.textLlaveValor(
+                                                'Precio de compra: ',
+                                                '${purchasePrice.toString()} Bs.',
+                                              ),
+                                              Utils.bigTextLlaveValor(
+                                                'Precio de venta: ',
+                                                '\n${salePrice.toString()} Bs.',
+                                              ),
+                                              Utils.espacio10
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
                       ),
                     ),
                     Padding(

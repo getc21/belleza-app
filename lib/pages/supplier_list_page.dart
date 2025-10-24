@@ -8,6 +8,7 @@ import 'package:belleza_app/utils/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SupplierListPage extends StatefulWidget {
   const SupplierListPage({super.key});
@@ -162,6 +163,33 @@ class _SupplierListPageState extends State<SupplierListPage> {
                             },
                             icon: const Icon(Icons.edit),
                             color: Colors.white, // Color del ícono
+                          ),
+                        ),
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.green,
+                          ),
+                          child: IconButton(
+                            icon: Icon(Icons.phone,
+                                color: Colors
+                                    .white), // Usa el icono de WhatsApp si está disponible
+                            onPressed: () async {
+                              final phone = supplier['contact_phone']
+                                      ?.replaceAll(RegExp(r'\D'), '') ??
+                                  '';
+                              final url =
+                                  'https://wa.me/591$phone'; // Sin el '+'
+                              try {
+                                await launchUrl(Uri.parse(url),
+                                    mode: LaunchMode.externalApplication);
+                              } catch (e) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text('No se pudo abrir WhatsApp')),
+                                );
+                              }
+                            },
                           ),
                         ),
                         Container(
